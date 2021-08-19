@@ -63,12 +63,6 @@ Test environment
 -->
 
 
-<!--
-## Test client
-
-DataMesh host a [test client](http://test.datameshgroup.com.au:8080/wsdebug/index.html) which can be used to test your message format. 
--->
-
 ## Message format
 
 > SaleToPOIRequest

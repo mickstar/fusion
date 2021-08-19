@@ -2,10 +2,11 @@
 title: Fusion API
 
 language_tabs: # must be one of https://git.io/vQNgJ
+  - json: JSON
   - java: Java
 
 toc_footers:
-  - v3.2 2020-08-13
+  - 2020-08-19
   - <a href='https://www.datameshgroup.com'>DataMesh Group</a>
 
 includes:
@@ -26,7 +27,7 @@ code_clipboard: true
 
 <!--
 
-TODO/QUESTIONS
+TODO
 
 Matched refunds - we require a POS to match refunds to original purchases. This is to enable support for alternative payments (e.g. Alipay/WeChat). 
 

@@ -46,7 +46,7 @@ Below is a an overview of the mandatory integration requirements.
 - Support for TLS and other [security requirements](#security-requirements)
 - Additional fields will be added to the message specification over time. To ensure forwards compatibility the Sale System must ignore when extra objects and fields are present in response messages. This includes valid MAC handling in the SecurityTrailer.
 - [Settings user interface](#settings-user-interface)
-- [Payments user interface](#payment-user-interface) which handles the `Initial UI`, `Final UI`, and `cancelling a sale in progress`
+- [Payments user interface](#payment-user-interface) which handles the `Initial UI`, `Final UI`, `Display UI`, and `cancelling a sale in progress`
 - Handle error scenarios as outlined in [error handling](#error-handling)
 - Ensure Sale System provides a unique [payment identification](#payment-identification)
 - Pass the accreditation [test script](#testing)
@@ -204,16 +204,16 @@ ARQC: XXXXXXXXXXXXXXXX           </br>
 
 <aside class="warning">
 
-The Sale System should implement <code>Initial UI</code>, <code>Final UI</code>, and the ability to <code>cancel a sale in progress</code>. 
+The Sale System should implement <code>Initial UI</code>, <code>Final UI</code>, <code>Display UI</code> and the ability to <code>cancel a sale in progress</code>. 
 
-Support for the other UI elements is optional and will be supported by a future Unify release. 
+The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
 
 </aside>
 
 
 If capable, the Sale System should present UI to the cashier for the duration of a payment. The content of the UI is set by the [input](#input) and [display](#display) request messages sent from the POI System.
 
-In the examples presented below the UI is contained in a modal shadow box. It is suggested that this UI be implemented by the Sale System in a way that fits the look and feel of the rest of the system.
+In the examples presented below the UI is contained in a modal shadow box. This is an example to help illustrate how this UI may be implemented. The Sale System should implement this UI in a way that fits the look and feel of the rest of the system.
 
 The Sale System must not block communication with the POI System when displaying the payments UI. The POI System may send a display or input request, followed by another display or input request, or the payment response. For example, the POI System may send a "SELECT ACCOUNT" display, followed by a "PROCESSING" display when the card holder selects their account on the POI terminal. The POI System may send a "SIGNATURE APPROVED" input request, followed by a "TIMEOUT" display and payment response, if the cashier doesn't approve the signature in time.
 
@@ -270,18 +270,7 @@ This UI should also enable the cashier to request a cancellation of the transact
                "OutputContent":{
                   "OutputFormat":"Text",
                   "OutputText":{
-                     "Text":"TEXT LINE 1 OF 6 MAX WIDTH 40 CHARACTERS"
-                  }
-               }
-            },
-            {
-               "ResponseRequiredFlag":false,
-               "Device":"CashierDisplay",
-               "InfoQualify":"Status",
-               "OutputContent":{
-                  "OutputFormat":"Text",
-                  "OutputText":{
-                     "Text":"TEXT LINE 2 OF 6 MAX WIDTH 40 CHARACTERS"
+                     "Text":"LINE OF TEXT MAX 40 CHARACTERS"
                   }
                }
             }			
@@ -294,7 +283,7 @@ This UI should also enable the cashier to request a cancellation of the transact
 
 The POI system will send zero or more [display request](#display) messages to the Sale System during a transaction. The Sale System should display these messages and continue to wait for the payment response.
 
-- Each display request will contain with 1 to 6 lines of text.
+- Each display request will contain at least 1 line of text.
 - Each line of text will be up to 40 characters wide.
 - The POI System should display the text centred.
 - The POI System should include the option to cancel the transaction.
@@ -306,6 +295,10 @@ The POI system will send zero or more [display request](#display) messages to th
 ![](images/dialog-display.png)
 
 #### Input UI
+
+<aside class="warning">
+The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
+</aside>
 
 The POI system will send zero or more [input request](#input) messages to the Sale System during a transaction. The Sale System should display these input requests, allow the cashier the option to answer the input request, and continue to wait for the payment response. The Sale System should not block on an input request, as the POI System may continue with the transaction before the Sale System has sent an input response.
 
