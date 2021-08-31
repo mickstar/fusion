@@ -516,6 +516,10 @@
 					
                   </li>
                   <li>
+                    <a href="#data-dictionary-categories" class="toc-h2 toc-link" data-title="Categories">Categories</a>
+					
+                  </li>
+                  <li>
                     <a href="#data-dictionary-certificationcode" class="toc-h2 toc-link" data-title="CertificationCode">CertificationCode</a>
 					
                   </li>
@@ -831,7 +835,7 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li>2020-08-19</li>
+            <li>2020-09-01</li>
             <li><a href='https://www.datameshgroup.com'>DataMesh Group</a></li>
         </ul>
     </div>
@@ -849,7 +853,6 @@ up a previous sale (i.e. when they have a central database between stores) but n
 
 Fix for this is to add a new "Transaction" status request which will work based on details from the receipt (e.g. TID/MID/DATETIME/STAN etc)
 
-
 -----------
 
 Not Implemented
@@ -859,14 +862,34 @@ In the payment request, nothing under PaymentTransaction.TransactionConditions i
 
 Do we want barcode/QR code in the receipts?
 
-Is basket data required for refunds ?
 What is ApprovalCode
 What is LastTransactionFlag
 SplitPaymentFlag - not included, therefor no special processing for split payments? Why support PaidAmount and MinimumSplitAmount?.
 Split - does basket need to match RequestedAmount? How do we deal with baskets when split payments? 
-Do we need basket in refund?
-
 Tokenisation
+
+
+TODO: 
+
+Add DiscountReason / DiscountDesc
+Add ProductURL, ProductImageURL
+Add RestrictedItem
+Re-word "total amount of the main sale item"
+Ensure SaleItem is the same for all instances
+Ensure deep links for each item are valid
+
+Update AdditionalInfo (Comments, Cooking instructions etc)
+
+Add example; 2-for-1 ??
+
+Explain
+/Cash /
+/Giftcard /
+
+
+Ports open in production 
+wss://prod1.datameshgroup.io:4000
+5000 for POS
 
 -->
 <h1 id='introduction'>Introduction</h1>
@@ -1273,8 +1296,8 @@ The option for the cashier to 'Cancel' is optional on the <code>GetConfirmation<
 <p>Each <a href="#data-dictionary-saleitem">SaleItem</a> record contains the following mandatory fields: </p>
 
 <ul>
-<li><strong>ItemID</strong> a unique identifier for the sale item within the context of this purchase. e.g. a 0..n integer which increments by one for each sale item.</li>
-<li><strong>ProductCode</strong> - a unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</li>
+<li><strong>ItemID</strong> a unique identifier for the sale item within the context of this payment. e.g. a 0..n integer which increments by one for each sale item.</li>
+<li><strong>ProductCode</strong> - a unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</li>
 <li><strong>ItemAmount</strong> - total amount of the sale item.</li>
 <li><strong>ProductLabel</strong> - a short, human readable, descriptive name of the product.  For example, <code>ProductLabel</code> could contain the product name typically printed on the customer receipt. </li>
 <li><strong>Quantity</strong> - item unit quantity</li>
@@ -2657,11 +2680,16 @@ will be rejected by the POI System until the next Login.</p>
                   </span><span class="nl">"AdditionalProductInfo"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"CostBase"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"Discount"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">],</span><span class="w">
                   </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"Tags"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">]</span><span class="w">
+                  </span><span class="nl">"PageURL"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"ImageURLs"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">],</span><span class="w">
+                  </span><span class="nl">"Size"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Colour"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Weight"</span><span class="p">:</span><span class="err">xx.xx</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"WeightUnitOfMeasure"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">                 
                </span><span class="p">}</span><span class="w">
             </span><span class="p">]</span><span class="w">
          </span><span class="p">},</span><span class="w">
@@ -3013,67 +3041,73 @@ will be rejected by the POI System until the next Login.</p>
 <td>  <a href="#data-dictionary-productcode">ProductCode</a></td>
 <td>✔</td>
 <td>String</td>
-<td>A unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
+<td>A unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-eanupc">EanUpc</a></td>
 <td></td>
 <td>String</td>
-<td>A standard unique identifier for the product. Either the UPC, EAN, or ISBN.</td>
+<td>A standard unique identifier for the product. Either the UPC, EAN, or ISBN. Required for products with a UPC, EAN, or ISBN</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-unitofmeasure">UnitOfMeasure</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Unit of measure of the <code>Quantity</code>. See <a href="#data-dictionary-unitofmeasure">UnitOfMeasure</a></td>
+<td>Unit of measure of the <code>Quantity</code>. If this item has no unit of measure, set to &quot;Other&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-quantity">Quantity</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Item unit quantity</td>
+<td>Sale item quantity based on <code>UnitOfMeasure</code>.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-unitprice">UnitPrice</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Price per item unit.</td>
+<td>Price per sale item unit. Present if <code>Quantity</code> is included.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-itemamount">ItemAmount</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Total amount of the item</td>
+<td>Total amount of the sale item</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-taxcode">TaxCode</a></td>
 <td></td>
 <td>String</td>
-<td>Type of tax associated with the item. Default = &quot;GST&quot;</td>
+<td>Type of tax associated with the sale item. Default = &quot;GST&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-salechannel">SaleChannel</a></td>
 <td></td>
 <td>String</td>
-<td>Commercial or distribution channel of the item. Default = &quot;Unknown&quot;</td>
+<td>Commercial or distribution channel of the sale item. Default = &quot;Unknown&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-productlabel">ProductLabel</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Product name of the item. See <a href="#data-dictionary-productlabel">ProductLabel</a></td>
+<td>a short, human readable, descriptive name of the product.  For example, <code>ProductLabel</code> could contain the product name typically printed on the customer receipt.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-additionalproductinfo">AdditionalProductInfo</a></td>
 <td></td>
 <td>String</td>
-<td>Additional information, or more detailed description of the product item</td>
+<td>Additional information, or more detailed description of the product item.</td>
+</tr>
+<tr>
+<td>  <a href="#parentitemid">ParentItemID</a></td>
+<td></td>
+<td>Integer</td>
+<td><em>Required</em> if this item is a &#39;modifier&#39; or sub-item. Contains the <a href="#data-dictionary-itemid">ItemID</a> of the parent <code>SaleItem</code></td>
 </tr>
 <tr>
 <td>  <a href="#costbase">CostBase</a></td>
 <td></td>
 <td>Decimal</td>
-<td>Cost of the product to the merchant</td>
+<td>Cost of the product to the merchant per unit</td>
 </tr>
 <tr>
 <td>  <a href="#discount">Discount</a></td>
@@ -3082,16 +3116,10 @@ will be rejected by the POI System until the next Login.</p>
 <td>If applied, the amount this sale item was discounted by</td>
 </tr>
 <tr>
-<td>  <a href="#category">Category</a></td>
+<td>  <a href="#data-dictionary-categories">Categories</a></td>
 <td></td>
-<td>String</td>
-<td>Product item category</td>
-</tr>
-<tr>
-<td>  <a href="#subcategory">SubCategory</a></td>
-<td></td>
-<td>String</td>
-<td>Product item sub category</td>
+<td>Array</td>
+<td>Array of categories. Top level &quot;main&quot; category at categories[0]. See <a href="#data-dictionary-categories">Categories</a> for more information.</td>
 </tr>
 <tr>
 <td>  <a href="#brand">Brand</a></td>
@@ -3103,13 +3131,61 @@ will be rejected by the POI System until the next Login.</p>
 <td>  <a href="#data-dictionary-quantityinstock">QuantityInStock</a></td>
 <td></td>
 <td>Decimal</td>
-<td>Remaining number of this item in stock</td>
+<td>Remaining number of this item in stock in same unit of measure as <code>Quantity</code></td>
 </tr>
 <tr>
 <td>  <a href="#sale-item-tags">Tags</a></td>
 <td></td>
 <td>Array</td>
-<td>Array of string with descriptive tags for the product</td>
+<td>String array with descriptive tags for the product</td>
+</tr>
+<tr>
+<td>  <a href="#restricted">Restricted</a></td>
+<td></td>
+<td>Boolean</td>
+<td><code>true</code> if this is a restricted item, <code>false</code> otherwise. Defaults to <code>false</code> when field is null.</td>
+</tr>
+<tr>
+<td>  <a href="#productpageurl">PageURL</a></td>
+<td></td>
+<td>String</td>
+<td>URL link to the sale items product page</td>
+</tr>
+<tr>
+<td>  <a href="#productimageurls">ImageURLs</a></td>
+<td></td>
+<td>Array</td>
+<td>String array of images URLs for this sale item</td>
+</tr>
+<tr>
+<td>  <a href="#style">Style</a></td>
+<td></td>
+<td>String</td>
+<td>Style of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#size">Size</a></td>
+<td></td>
+<td>String</td>
+<td>Size of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#colour">Colour</a></td>
+<td></td>
+<td>String</td>
+<td>Colour of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#weight">Weight</a></td>
+<td></td>
+<td>Decimal</td>
+<td>Sale item weight, based on <code>WeightUnitOfMeasure</code></td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-unitofmeasure">WeightUnitOfMeasure</a></td>
+<td></td>
+<td>String</td>
+<td>Unit of measure of the <code>Weight</code>.</td>
 </tr>
 <tr>
 <td> <strong>PaymentData</strong></td>
@@ -6214,11 +6290,16 @@ In most cases the Sale System should attempt to
                   </span><span class="nl">"AdditionalProductInfo"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"CostBase"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"Discount"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">],</span><span class="w">
                   </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
                   </span><span class="nl">"Tags"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">]</span><span class="w">
+                  </span><span class="nl">"PageURL"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"ImageURLs"</span><span class="p">:[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="s2">"xxx"</span><span class="p">],</span><span class="w">
+                  </span><span class="nl">"Size"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Colour"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"Weight"</span><span class="p">:</span><span class="err">xx.xx</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"WeightUnitOfMeasure"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">   
                </span><span class="p">}</span><span class="w">
             </span><span class="p">]</span><span class="w">
          </span><span class="p">},</span><span class="w">
@@ -6557,67 +6638,73 @@ In most cases the Sale System should attempt to
 <td>  <a href="#data-dictionary-productcode">ProductCode</a></td>
 <td>✔</td>
 <td>String</td>
-<td>A unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
+<td>A unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-eanupc">EanUpc</a></td>
 <td></td>
 <td>String</td>
-<td>A standard unique identifier for the product. Either the UPC, EAN, or ISBN.</td>
+<td>A standard unique identifier for the product. Either the UPC, EAN, or ISBN. Required for products with a UPC, EAN, or ISBN</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-unitofmeasure">UnitOfMeasure</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Unit of measure of the <code>Quantity</code>. See <a href="#data-dictionary-unitofmeasure">UnitOfMeasure</a></td>
+<td>Unit of measure of the <code>Quantity</code>. If this item has no unit of measure, set to &quot;Other&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-quantity">Quantity</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Item unit quantity.</td>
+<td>Sale item quantity based on <code>UnitOfMeasure</code>.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-unitprice">UnitPrice</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Price per item unit.</td>
+<td>Price per sale item unit. Present if <code>Quantity</code> is included.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-itemamount">ItemAmount</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Total amount of the item</td>
+<td>Total amount of the sale item</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-taxcode">TaxCode</a></td>
 <td></td>
 <td>String</td>
-<td>Type of tax associated with the item. Default = &quot;GST&quot;</td>
+<td>Type of tax associated with the sale item. Default = &quot;GST&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-salechannel">SaleChannel</a></td>
 <td></td>
 <td>String</td>
-<td>Commercial or distribution channel of the item. Default = &quot;Unknown&quot;</td>
+<td>Commercial or distribution channel of the sale item. Default = &quot;Unknown&quot;</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-productlabel">ProductLabel</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Product name of the item. See <a href="#data-dictionary-productlabel">ProductLabel</a></td>
+<td>a short, human readable, descriptive name of the product.  For example, <code>ProductLabel</code> could contain the product name typically printed on the customer receipt.</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-additionalproductinfo">AdditionalProductInfo</a></td>
 <td></td>
 <td>String</td>
-<td>Additional information, or more detailed description of the product item</td>
+<td>Additional information, or more detailed description of the product item.</td>
+</tr>
+<tr>
+<td>  <a href="#parentitemid">ParentItemID</a></td>
+<td></td>
+<td>Integer</td>
+<td><em>Required</em> if this item is a &#39;modifier&#39; or sub-item. Contains the <a href="#data-dictionary-itemid">ItemID</a> of the parent <code>SaleItem</code></td>
 </tr>
 <tr>
 <td>  <a href="#costbase">CostBase</a></td>
 <td></td>
 <td>Decimal</td>
-<td>Cost of the product to the merchant</td>
+<td>Cost of the product to the merchant per unit</td>
 </tr>
 <tr>
 <td>  <a href="#discount">Discount</a></td>
@@ -6626,16 +6713,10 @@ In most cases the Sale System should attempt to
 <td>If applied, the amount this sale item was discounted by</td>
 </tr>
 <tr>
-<td>  <a href="#category">Category</a></td>
+<td>  <a href="#data-dictionary-categories">Categories</a></td>
 <td></td>
-<td>String</td>
-<td>Product item category</td>
-</tr>
-<tr>
-<td>  <a href="#subcategory">SubCategory</a></td>
-<td></td>
-<td>String</td>
-<td>Product item sub category</td>
+<td>Array</td>
+<td>Array of categories. Top level &quot;main&quot; category at categories[0]. See <a href="#data-dictionary-categories">Categories</a> for more information.</td>
 </tr>
 <tr>
 <td>  <a href="#brand">Brand</a></td>
@@ -6647,13 +6728,61 @@ In most cases the Sale System should attempt to
 <td>  <a href="#data-dictionary-quantityinstock">QuantityInStock</a></td>
 <td></td>
 <td>Decimal</td>
-<td>Remaining number of this item in stock</td>
+<td>Remaining number of this item in stock in same unit of measure as <code>Quantity</code></td>
 </tr>
 <tr>
 <td>  <a href="#sale-item-tags">Tags</a></td>
 <td></td>
 <td>Array</td>
-<td>Array of string with descriptive tags for the product</td>
+<td>String array with descriptive tags for the product</td>
+</tr>
+<tr>
+<td>  <a href="#restricted">Restricted</a></td>
+<td></td>
+<td>Boolean</td>
+<td><code>true</code> if this is a restricted item, <code>false</code> otherwise. Defaults to <code>false</code> when field is null.</td>
+</tr>
+<tr>
+<td>  <a href="#productpageurl">PageURL</a></td>
+<td></td>
+<td>String</td>
+<td>URL link to the sale items product page</td>
+</tr>
+<tr>
+<td>  <a href="#productimageurls">ImageURLs</a></td>
+<td></td>
+<td>Array</td>
+<td>String array of images URLs for this sale item</td>
+</tr>
+<tr>
+<td>  <a href="#style">Style</a></td>
+<td></td>
+<td>String</td>
+<td>Style of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#size">Size</a></td>
+<td></td>
+<td>String</td>
+<td>Size of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#colour">Colour</a></td>
+<td></td>
+<td>String</td>
+<td>Colour of the sale item</td>
+</tr>
+<tr>
+<td>  <a href="#weight">Weight</a></td>
+<td></td>
+<td>Decimal</td>
+<td>Sale item weight, based on <code>WeightUnitOfMeasure</code></td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-unitofmeasure">WeightUnitOfMeasure</a></td>
+<td></td>
+<td>String</td>
+<td>Unit of measure of the <code>Weight</code>.</td>
 </tr>
 <tr>
 <td> <strong>PaymentData</strong></td>
@@ -7301,6 +7430,32 @@ Sale System should allow for a "catch all" which handles currently undefined err
 <li>&quot;PayPal&quot;</li>
 <li>&quot;Card&quot;</li>
 </ul>
+<h2 id='data-dictionary-categories'>Categories</h2>
+<p><code>Categories</code> is a string array which represents the categories of a <code>SaleItem</code></p>
+
+<p>The main category is at the zero element.</p>
+
+<p>For example: </p>
+
+<table><thead>
+<tr>
+<th>Example</th>
+<th>Array</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SaleItem with a single category</td>
+<td><code>{ &quot;categories&quot;: [ &quot;Shirts&quot; ] }</code></td>
+</tr>
+<tr>
+<td>SaleItem with a main and sub category</td>
+<td><code>{ &quot;categories&quot;: [ &quot;Food&quot;, &quot;Mains&quot; ] }</code></td>
+</tr>
+<tr>
+<td>SaleItem with multiple categories</td>
+<td><code>{ &quot;categories&quot;: [ &quot;Computers&quot;, &quot;Accessories&quot;, &quot;Keyboards&quot; ] }</code></td>
+</tr>
+</tbody></table>
 <h2 id='data-dictionary-certificationcode'>CertificationCode</h2>
 <p>Certification code for this Sale System provided by Data Mesh</p>
 <h2 id='data-dictionary-datetime'>DateTime</h2>
@@ -8311,17 +8466,51 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <p>If the &quot;bundle&quot; is a shortcut in the Sale System which has no value associated and is simply used to add multiple products to the basket, include each product as a <code>SaleItem</code>.</p>
 
 <p>Any <code>SaleItem</code> discounts associated with the &quot;item bundle&quot; should be included in the <code>Discount</code> field.</p>
-<h3 id='data-dictionary-saleitem-discounts'>Discounts</h3>
+<h3 id='data-dictionary-saleitem-discounts'>Discounts</h3><div class="highlight"><pre class="highlight json tab-json"><code><span class="nl">"SaleItem"</span><span class="p">:[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductCode"</span><span class="p">:</span><span class="s2">"XXVH776"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitPrice"</span><span class="p">:</span><span class="s2">"100.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"80.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Shirt"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Discount"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"DiscountReason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20% OFF SALE"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ParentItemID"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductCode"</span><span class="p">:</span><span class="s2">"XXVH777"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitPrice"</span><span class="p">:</span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"-10.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"$10 voucher"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Discount"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"DiscountReason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"$10 voucher"</span><span class="w"> 
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
 <p>Discounts applied to the basket should be reflected by the <code>SaleItem</code> array based on how the Sale System handles discounts: </p>
 
 <ul>
 <li>For discounts applied across the basket or to an individual item:
 
 <ul>
+<li>Set <code>UnitPrice</code> to the original item price</li>
 <li>Update <code>ItemAmount</code> to reflect the discounted amount</li>
 <li>Set <code>Discount</code> to reflect the discounted amount per item </li>
+<li>Set <code>DiscountReason</code> to the reason the item was discounted</li>
 </ul></li>
-<li>For a discount applied as a sale item, include a <code>SaleItem</code> with a negative <code>ItemAmount</code> </li>
+<li>For a discount or voucher applied as a sale item:
+
+<ul>
+<li>Set <code>UnitPrice</code> to <code>0</code></li>
+<li>Include a <code>SaleItem</code> with a negative <code>ItemAmount</code> </li>
+<li>Set <code>Discount</code> to the discount value </li>
+<li>Set <code>DiscountReason</code> to the reason for the discount</li>
+</ul></li>
 </ul>
 <h3 id='data-dictionary-saleitem-refunds'>Refunds</h3>
 <p>If the sale items are known for a refund, they should be represented in the <code>SaleItem</code> array, otherwise the <code>SaleItem</code> array can be left empty.</p>
@@ -8359,8 +8548,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
     </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Coca-Cola No Sugar 1.25L"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"CostBase"</span><span class="p">:</span><span class="s2">"0.75"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"Discount"</span><span class="p">:</span><span class="s2">"0.00"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"Drink"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"Soft Drink"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Drinks"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Soft Drink"</span><span class="p">],</span><span class="w">
     </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"Coca-Cola"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"42"</span><span class="w">
   </span><span class="p">},</span><span class="w">
@@ -8375,8 +8563,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
     </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Doritos Corn Chips Cheese Supreme Share Pack 170g"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"CostBase"</span><span class="p">:</span><span class="s2">"1.42"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"Discount"</span><span class="p">:</span><span class="s2">"0.24"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"Snacks &amp; Confectionery"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"Chips"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Snacks &amp; Confectionery"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Chips"</span><span class="p">],</span><span class="w">
     </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"Doritos"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"15"</span><span class="w">
   </span><span class="p">},</span><span class="w">   
@@ -8399,9 +8586,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
     </span><span class="nl">"UnitPrice"</span><span class="p">:</span><span class="s2">"54.00"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"54.00"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Sirloin steak"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"AdditionalProductInfo"</span><span class="p">:</span><span class="s2">"Pepper sauce"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"Food"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"Mains"</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Food"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Mains"</span><span class="p">]</span><span class="w">
   </span><span class="p">},</span><span class="w">
   </span><span class="p">{</span><span class="w">
     </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="w">
@@ -8409,9 +8594,8 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
     </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"0"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Pepper sauce"</span><span class="w">
-    </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"Food"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"Mains"</span><span class="w">
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Pepper sauce"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Food"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Mains"</span><span class="p">]</span><span class="w">
   </span><span class="p">},</span><span class="w">  
   </span><span class="p">{</span><span class="w">
     </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="w">
@@ -8419,10 +8603,47 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
     </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"0"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Side of fries"</span><span class="w">
-    </span><span class="nl">"Category"</span><span class="p">:</span><span class="s2">"Food"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"SubCategory"</span><span class="p">:</span><span class="s2">"Sides"</span><span class="w">
-  </span><span class="p">},</span><span class="w">  
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"Side of fries"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Food"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Sides"</span><span class="p">]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductCode"</span><span class="p">:</span><span class="s2">"24115522"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitPrice"</span><span class="p">:</span><span class="s2">"79.95"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"79.95"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"NOLTE LS SHIRT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"CostBase"</span><span class="p">:</span><span class="s2">"40.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Discount"</span><span class="p">:</span><span class="s2">"0.00"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Men"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Clothing"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Shirts"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"ACADEMY BRAND"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"55"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"PageURL"</span><span class="p">:</span><span class="s2">"https://myweb/24115522/Nolte-LS-Shirt.html"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ImageURLs"</span><span class="p">:[</span><span class="s2">"https://myweb/productimages/24115522.jpg"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"Size"</span><span class="p">:</span><span class="s2">"XL"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Colour"</span><span class="p">:</span><span class="s2">"SLATE GREEN CHECK"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Weight"</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"WeightUnitOfMeasure"</span><span class="p">:</span><span class="s2">"Gram"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ItemID"</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductCode"</span><span class="p">:</span><span class="s2">"24390516"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitOfMeasure"</span><span class="p">:</span><span class="s2">"Other"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Quantity"</span><span class="p">:</span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"UnitPrice"</span><span class="p">:</span><span class="s2">"1650"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ItemAmount"</span><span class="p">:</span><span class="s2">"1650"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ProductLabel"</span><span class="p">:</span><span class="s2">"JIMMY CHOO LUIS 90 PUMP"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Categories"</span><span class="p">:[</span><span class="s2">"Women"</span><span class="p">,</span><span class="s2">"Shoes"</span><span class="p">,</span><span class="s2">"Heels"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"Brand"</span><span class="p">:</span><span class="s2">"JIMMY CHOO"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"QuantityInStock"</span><span class="p">:</span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"PageURL"</span><span class="p">:</span><span class="s2">"https://website/24390516/Luis-90-Pump.html"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ImageURLs"</span><span class="p">:[</span><span class="s2">"https://website/productimages/24390516.jpg"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"Size"</span><span class="p">:</span><span class="s2">"38 EU"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Colour"</span><span class="p">:</span><span class="s2">"BALLET PINK/CRYSTAL"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Weight"</span><span class="p">:</span><span class="mi">500</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"WeightUnitOfMeasure"</span><span class="p">:</span><span class="s2">"Gram"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre></div>
 <table><thead>
@@ -8443,7 +8664,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <td><a href="#data-dictionary-productcode">ProductCode</a></td>
 <td>✔</td>
 <td>String</td>
-<td>A unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
+<td>A unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same <code>ProductCode</code>.</td>
 </tr>
 <tr>
 <td><a href="#data-dictionary-eanupc">EanUpc</a></td>
@@ -8461,7 +8682,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <td><a href="#data-dictionary-quantity">Quantity</a></td>
 <td>✔</td>
 <td>Decimal</td>
-<td>Sale item quantity based on <code>UnitOfMeasure</code>. If a</td>
+<td>Sale item quantity based on <code>UnitOfMeasure</code>.</td>
 </tr>
 <tr>
 <td><a href="#data-dictionary-unitprice">UnitPrice</a></td>
@@ -8497,7 +8718,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <td><a href="#data-dictionary-additionalproductinfo">AdditionalProductInfo</a></td>
 <td></td>
 <td>String</td>
-<td>Additional information, or more detailed description of the product item. This may include modifiers for customisable products, such as &quot;small&quot;, &quot;medium&quot;, or &quot;large&quot; for a coffee, or &quot;medium-rare&quot; for a steak.</td>
+<td>Additional information, or more detailed description of the product item.</td>
 </tr>
 <tr>
 <td><a href="#parentitemid">ParentItemID</a></td>
@@ -8518,16 +8739,10 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <td>If applied, the amount this sale item was discounted by</td>
 </tr>
 <tr>
-<td><a href="#category">Category</a></td>
+<td><a href="#data-dictionary-categories">Categories</a></td>
 <td></td>
-<td>String</td>
-<td>Product item category</td>
-</tr>
-<tr>
-<td><a href="#subcategory">SubCategory</a></td>
-<td></td>
-<td>String</td>
-<td>Product item sub category</td>
+<td>Array</td>
+<td>Array of categories. Top level &quot;main&quot; category at categories[0]. See <a href="#data-dictionary-categories">Categories</a> for more information.</td>
 </tr>
 <tr>
 <td><a href="#brand">Brand</a></td>
@@ -8545,7 +8760,55 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 <td><a href="#sale-item-tags">Tags</a></td>
 <td></td>
 <td>Array</td>
-<td>Array of string with descriptive tags for the product</td>
+<td>String array with descriptive tags for the product</td>
+</tr>
+<tr>
+<td><a href="#restricted">Restricted</a></td>
+<td></td>
+<td>Boolean</td>
+<td><code>true</code> if this is a restricted item, <code>false</code> otherwise. Defaults to <code>false</code> when field is null.</td>
+</tr>
+<tr>
+<td><a href="#productpageurl">PageURL</a></td>
+<td></td>
+<td>String</td>
+<td>URL link to the sale items product page</td>
+</tr>
+<tr>
+<td><a href="#productimageurls">ImageURLs</a></td>
+<td></td>
+<td>Array</td>
+<td>String array of images URLs for this sale item</td>
+</tr>
+<tr>
+<td><a href="#style">Style</a></td>
+<td></td>
+<td>String</td>
+<td>Style of the sale item</td>
+</tr>
+<tr>
+<td><a href="#size">Size</a></td>
+<td></td>
+<td>String</td>
+<td>Size of the sale item</td>
+</tr>
+<tr>
+<td><a href="#colour">Colour</a></td>
+<td></td>
+<td>String</td>
+<td>Colour of the sale item</td>
+</tr>
+<tr>
+<td><a href="#weight">Weight</a></td>
+<td></td>
+<td>Decimal</td>
+<td>Sale item weight, based on <code>WeightUnitOfMeasure</code></td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-unitofmeasure">WeightUnitOfMeasure</a></td>
+<td></td>
+<td>String</td>
+<td>Unit of measure of the <code>Weight</code>.</td>
 </tr>
 </tbody></table>
 <h2 id='data-dictionary-salechannel'>SaleChannel</h2>
@@ -8738,14 +9001,11 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
   - Test timeouts etc
 -->
 <h1 id='production'>Production</h1>
-<aside class="notice">Pending...</aside>
-
 <p>The production build of the Sale System should include the following: </p>
 
 <ul>
 <li>A production <a href="#data-dictionary-certificationcode">CertificationCode</a>, provided by DataMesh after successful accreditation </li>
 <li>Update the <a href="#endpoints">EndPoint</a> to the production URL</li>
-<li>Ensure the POS connects with a production <a href="#kek">KEK</a></li>
 </ul>
 
 <p>Merchant checklist for go-live. e.g. 
@@ -8829,6 +9089,45 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Tap the back icon (⬅) </li>
 <li>Hit the &quot;home&quot; button on the terminal to view the home page</li>
 </ul>
+<h4 id='appendix-terminal-configuration-pax-terminals-configure-terminal-environment'>Configure terminal environment</h4>
+<p>Your development terminal will be conncted to the UAT environment, which is the correct environemnt for testing. </p>
+
+<p>To confirm or change the environemnt:</p>
+
+<ul>
+<li>Launch the Satellite payment app</li>
+<li>Tap the settings icon (⚙)</li>
+<li>Enter 8801 as the merchant password</li>
+<li>You&#39;ll be presented with a &quot;Change Host URL&quot; dialog</li>
+<li>Ensure the URL is <code>wss://test.datameshgroup.com.au/peduat1</code> and tap Enter</li>
+</ul>
+
+<p><img src="images/pinpad-host-url-270x480-8d00913e.png" alt="" /></p>
+
+<ul>
+<li>Restart the Satellite payment app 
+
+<ul>
+<li>Tap the task switcher button</li>
+<li>Close the Satellite payment app</li>
+<li>Launch the Satellite payment app again </li>
+</ul></li>
+</ul>
+<h4 id='appendix-terminal-configuration-pax-terminals-connect-to-wi-fi'>Connect to Wi-Fi</h4>
+<p>The terminal can be connected to Wi-Fi where cellular access isn&#39;t avaiable. </p>
+
+<ul>
+<li>Press the Home button </li>
+<li>Launch the &quot;Settings&quot; app (⚙icon)</li>
+</ul>
+
+<p><img src="images/pinpad-launch-settings-270x480-a26aea90.png" alt="" /></p>
+
+<ul>
+<li>If it asks for a password, enter <code>pax9876@@</code></li>
+<li>Select Wi-Fi open, choose your Wi-Fi network and enter the password</li>
+<li>You should see your Wi-Fi network with a &quot;Connected&quot; status underneath </li>
+</ul>
 <h4 id='appendix-terminal-configuration-pax-terminals-update-settings'>Update settings</h4>
 <p>The terminal will periodically connect to the host and download updated settings.</p>
 
@@ -8854,21 +9153,6 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Select the <code>SOFTWARE UPGRADE</code> option and select <code>YES</code> on the confirmation dialog</li>
 <li>The software will be downloaded, and Satellite will restart</li>
 </ul>
-<h4 id='appendix-terminal-configuration-pax-terminals-connect-to-wi-fi'>Connect to Wi-Fi</h4>
-<p>The terminal can be connected to Wi-Fi where cellular access isn&#39;t avaiable. </p>
-
-<ul>
-<li>Press the Home button </li>
-<li>Launch the &quot;Settings&quot; app (⚙icon)</li>
-</ul>
-
-<p><img src="images/pinpad-launch-settings-270x480-a26aea90.png" alt="" /></p>
-
-<ul>
-<li>If it asks for a password, enter <code>pax9876@@</code></li>
-<li>Select Wi-Fi open, choose your Wi-Fi network and enter the password</li>
-<li>You should see your Wi-Fi network with a &quot;Connected&quot; status underneath </li>
-</ul>
 <h4 id='appendix-terminal-configuration-pax-terminals-checking-wi-fi-connection'>Checking Wi-Fi connection</h4>
 <p>To check Wi-FI connection status at any time:</p>
 
@@ -8876,30 +9160,6 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Swipe down from the top of the screen to open the notification shade</li>
 <li>Swipe down again to expand the notification shade</li>
 <li>Top left icon will be your Wi-Fi status and connected access point</li>
-</ul>
-<h4 id='appendix-terminal-configuration-pax-terminals-configure-terminal-environment'>Configure terminal environment</h4>
-<p>Your development terminal will be conncted to the UAT environment, which is the correct environemnt for testing. </p>
-
-<p>To confirm or change the environemnt:</p>
-
-<ul>
-<li>Launch the Satellite payment app</li>
-<li>Tap the settings icon (⚙)</li>
-<li>Enter 8801 as the merchant password</li>
-<li>You&#39;ll be presented with a &quot;Change Host URL&quot; dialog</li>
-<li>Ensure the URL is <code>wss://test.datameshgroup.com.au/peduat1</code> and tap Enter</li>
-</ul>
-
-<p><img src="images/pinpad-host-url-270x480-8d00913e.png" alt="" /></p>
-
-<ul>
-<li>Restart the Satellite payment app 
-
-<ul>
-<li>Tap the task switcher button</li>
-<li>Close the Satellite payment app</li>
-<li>Launch the Satellite payment app again </li>
-</ul></li>
 </ul>
 
       </div>
