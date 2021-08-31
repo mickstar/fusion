@@ -414,8 +414,8 @@ It can accomplish this by including an array of [SaleItem](#data-dictionary-sale
 
 Each [SaleItem](#data-dictionary-saleitem) record contains the following mandatory fields: 
 
-- **ItemID** a unique identifier for the sale item within the context of this purchase. e.g. a 0..n integer which increments by one for each sale item.
-- **ProductCode** - a unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same `ProductCode`.
+- **ItemID** a unique identifier for the sale item within the context of this payment. e.g. a 0..n integer which increments by one for each sale item.
+- **ProductCode** - a unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same `ProductCode`.
 - **ItemAmount** - total amount of the sale item.
 - **ProductLabel** - a short, human readable, descriptive name of the product.  For example, `ProductLabel` could contain the product name typically printed on the customer receipt. 
 - **Quantity** - item unit quantity

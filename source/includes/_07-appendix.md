@@ -74,6 +74,40 @@ In a production environment a terminal will typically be locked to the payment a
 - Hit the "home" button on the terminal to view the home page
 
 
+
+#### Configure terminal environment
+
+Your development terminal will be conncted to the UAT environment, which is the correct environemnt for testing. 
+
+To confirm or change the environemnt:
+
+- Launch the Satellite payment app
+- Tap the settings icon (⚙)
+- Enter 8801 as the merchant password
+- You'll be presented with a "Change Host URL" dialog
+- Ensure the URL is `wss://test.datameshgroup.com.au/peduat1` and tap Enter
+
+![](images/pinpad-host-url-270x480.png)
+
+- Restart the Satellite payment app 
+  - Tap the task switcher button
+  - Close the Satellite payment app
+  - Launch the Satellite payment app again 
+
+
+#### Connect to Wi-Fi
+
+The terminal can be connected to Wi-Fi where cellular access isn't avaiable. 
+
+- Press the Home button 
+- Launch the "Settings" app (⚙icon)
+
+![](images/pinpad-launch-settings-270x480.png)
+
+- If it asks for a password, enter `pax9876@@`
+- Select Wi-Fi open, choose your Wi-Fi network and enter the password
+- You should see your Wi-Fi network with a "Connected" status underneath 
+
 #### Update settings
 
 The terminal will periodically connect to the host and download updated settings.
@@ -99,21 +133,6 @@ To force a software update:
 - Select the `SOFTWARE UPGRADE` option and select `YES` on the confirmation dialog
 - The software will be downloaded, and Satellite will restart
 
-
-#### Connect to Wi-Fi
-
-The terminal can be connected to Wi-Fi where cellular access isn't avaiable. 
-
-- Press the Home button 
-- Launch the "Settings" app (⚙icon)
-
-![](images/pinpad-launch-settings-270x480.png)
-
-- If it asks for a password, enter `pax9876@@`
-- Select Wi-Fi open, choose your Wi-Fi network and enter the password
-- You should see your Wi-Fi network with a "Connected" status underneath 
-
-
 #### Checking Wi-Fi connection
 
 To check Wi-FI connection status at any time:
@@ -122,22 +141,3 @@ To check Wi-FI connection status at any time:
 - Swipe down again to expand the notification shade
 - Top left icon will be your Wi-Fi status and connected access point
 
-
-#### Configure terminal environment
-
-Your development terminal will be conncted to the UAT environment, which is the correct environemnt for testing. 
-
-To confirm or change the environemnt:
-
-- Launch the Satellite payment app
-- Tap the settings icon (⚙)
-- Enter 8801 as the merchant password
-- You'll be presented with a "Change Host URL" dialog
-- Ensure the URL is `wss://test.datameshgroup.com.au/peduat1` and tap Enter
-
-![](images/pinpad-host-url-270x480.png)
-
-- Restart the Satellite payment app 
-  - Tap the task switcher button
-  - Close the Satellite payment app
-  - Launch the Satellite payment app again 

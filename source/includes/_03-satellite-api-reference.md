@@ -309,11 +309,16 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
                   "AdditionalProductInfo":"xxx",
 				  "CostBase":"xxx",
 				  "Discount":"xxx",
-				  "Category":"xxx",
-				  "SubCategory":"xxx",
+				  "Categories":["xxx","xxx"],
 				  "Brand":"xxx",
 				  "QuantityInStock":"xxx",
 				  "Tags":["xxx","xxx","xxx"]
+                  "PageURL":"xxx",
+                  "ImageURLs":["xxx","xxx"],
+                  "Size":"xxx",
+                  "Colour":"xxx",
+                  "Weight":xx.xx,
+                  "WeightUnitOfMeasure":"xxx"	
                }
             ]
          },
@@ -422,23 +427,31 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
   [MerchantCategoryCode](#data-dictionary-merchantcategorycode)|  | String | If present, overrides the MCC used for processing the transaction if allowed. Refer to ISO 18245 for available codes.
  **[SaleItem](#data-dictionary-saleitem)**                   | ✔ | Array  | Array of [SaleItem](#data-dictionary-saleitem) objects which represent the product basket attached to this transaction. See [SaleItem](#data-dictionary-saleitem) for examples.
   [ItemID](#data-dictionary-itemid)                          | ✔ | Integer | A unique identifier for the sale item within the context of this payment. e.g. a 0..n integer which increments by one for each sale item.
-  [ProductCode](#data-dictionary-productcode)                | ✔ | String | A unique identifier for the product within the merchant. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same `ProductCode`.
-  [EanUpc](#data-dictionary-eanupc)                          |  | String | A standard unique identifier for the product. Either the UPC, EAN, or ISBN.
-  [UnitOfMeasure](#data-dictionary-unitofmeasure)            | ✔ | String | Unit of measure of the `Quantity`. See [UnitOfMeasure](#data-dictionary-unitofmeasure)
-  [Quantity](#data-dictionary-quantity)                      | ✔ | Decimal| Item unit quantity.
-  [UnitPrice](#data-dictionary-unitprice)                    | ✔ | Decimal| Price per item unit.
-  [ItemAmount](#data-dictionary-itemamount)                  | ✔ | Decimal| Total amount of the item
-  [TaxCode](#data-dictionary-taxcode)                        |  | String | Type of tax associated with the item. Default = "GST"
-  [SaleChannel](#data-dictionary-salechannel)                |  | String | Commercial or distribution channel of the item. Default = "Unknown"
-  [ProductLabel](#data-dictionary-productlabel)              | ✔ | String | Product name of the item. See [ProductLabel](#data-dictionary-productlabel)
-  [AdditionalProductInfo](#data-dictionary-additionalproductinfo)|  | String | Additional information, or more detailed description of the product item
-  [CostBase](#costbase)                      |  | Decimal| Cost of the product to the merchant 
-  [Discount](#discount)                      |  | Decimal| If applied, the amount this sale item was discounted by
-  [Category](#category)                      |  | String | Product item category 
-  [SubCategory](#subcategory)                |  | String | Product item sub category 
-  [Brand](#brand)                            |  | String | Brand name - typically visible on the product packaging or label
-  [QuantityInStock](#data-dictionary-quantityinstock)        |  | Decimal| Remaining number of this item in stock
-  [Tags](#sale-item-tags)                    |  | Array  | Array of string with descriptive tags for the product
+  [ProductCode](#data-dictionary-productcode)                | ✔ | String | A unique identifier for the product within the merchant, such as the SKU. For example if two customers purchase the same product at two different stores owned by the merchant, both purchases should contain the same `ProductCode`.
+  [EanUpc](#data-dictionary-eanupc)                          |  | String | A standard unique identifier for the product. Either the UPC, EAN, or ISBN. Required for products with a UPC, EAN, or ISBN
+  [UnitOfMeasure](#data-dictionary-unitofmeasure)            | ✔ | String | Unit of measure of the `Quantity`. If this item has no unit of measure, set to "Other"
+  [Quantity](#data-dictionary-quantity)                      | ✔ | Decimal| Sale item quantity based on `UnitOfMeasure`.
+  [UnitPrice](#data-dictionary-unitprice)                    | ✔ | Decimal| Price per sale item unit. Present if `Quantity` is included.
+  [ItemAmount](#data-dictionary-itemamount)                  | ✔ | Decimal| Total amount of the sale item
+  [TaxCode](#data-dictionary-taxcode)                        |  | String | Type of tax associated with the sale item. Default = "GST"
+  [SaleChannel](#data-dictionary-salechannel)                |  | String | Commercial or distribution channel of the sale item. Default = "Unknown"
+  [ProductLabel](#data-dictionary-productlabel)              | ✔ | String | a short, human readable, descriptive name of the product.  For example, `ProductLabel` could contain the product name typically printed on the customer receipt. 
+  [AdditionalProductInfo](#data-dictionary-additionalproductinfo)|  | String | Additional information, or more detailed description of the product item. 
+  [ParentItemID](#parentitemid)                              |  | Integer | *Required* if this item is a 'modifier' or sub-item. Contains the [ItemID](#data-dictionary-itemid) of the parent `SaleItem`
+  [CostBase](#costbase)                                      |  | Decimal| Cost of the product to the merchant per unit
+  [Discount](#discount)                                      |  | Decimal| If applied, the amount this sale item was discounted by
+  [Categories](#data-dictionary-categories)                  |  | Array  | Array of categories. Top level "main" category at categories[0]. See [Categories](#data-dictionary-categories) for more information.
+  [Brand](#brand)                                            |  | String | Brand name - typically visible on the product packaging or label
+  [QuantityInStock](#data-dictionary-quantityinstock)        |  | Decimal| Remaining number of this item in stock in same unit of measure as `Quantity`
+  [Tags](#sale-item-tags)                                    |  | Array  | String array with descriptive tags for the product
+  [Restricted](#restricted)                                  |  | Boolean| `true` if this is a restricted item, `false` otherwise. Defaults to `false` when field is null.
+  [PageURL](#productpageurl)                                 |  | String | URL link to the sale items product page
+  [ImageURLs](#productimageurls)                             |  | Array | String array of images URLs for this sale item
+  [Style](#style)                                            |  | String | Style of the sale item
+  [Size](#size)                                              |  | String | Size of the sale item
+  [Colour](#colour)                                          |  | String | Colour of the sale item
+  [Weight](#weight)                                          |  | Decimal | Sale item weight, based on `WeightUnitOfMeasure`
+  [WeightUnitOfMeasure](#data-dictionary-unitofmeasure)      |  | String | Unit of measure of the `Weight`. 
  **PaymentData**                             | ✔ | Object | Object representing the payment method. Present only if any of the JSON elements within are present.
   [PaymentType](#data-dictionary-paymenttype)                | ✔ | String | Defaults to "Normal". Indicates the type of payment to process. "Normal", "Refund", or "CashAdvance". See [PaymentType](#data-dictionary-paymenttype)
   **[PaymentInstrumentData](#data-dictionary-paymentinstrumentdata)** |  | Object | Object with represents card details for token or manually enter card details. See  for object structure

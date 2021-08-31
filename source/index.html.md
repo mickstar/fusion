@@ -36,7 +36,6 @@ up a previous sale (i.e. when they have a central database between stores) but n
 
 Fix for this is to add a new "Transaction" status request which will work based on details from the receipt (e.g. TID/MID/DATETIME/STAN etc)
 
-
 -----------
 
 Not Implemented
@@ -46,13 +45,33 @@ In the payment request, nothing under PaymentTransaction.TransactionConditions i
 
 Do we want barcode/QR code in the receipts?
 
-Is basket data required for refunds ?
 What is ApprovalCode
 What is LastTransactionFlag
 SplitPaymentFlag - not included, therefor no special processing for split payments? Why support PaidAmount and MinimumSplitAmount?.
 Split - does basket need to match RequestedAmount? How do we deal with baskets when split payments? 
-Do we need basket in refund?
-
 Tokenisation
+
+
+TODO: 
+
+Add DiscountReason / DiscountDesc
+Add ProductURL, ProductImageURL
+Add RestrictedItem
+Re-word "total amount of the main sale item"
+Ensure SaleItem is the same for all instances
+Ensure deep links for each item are valid
+
+Update AdditionalInfo (Comments, Cooking instructions etc)
+
+Add example; 2-for-1 ??
+
+Explain
+/Cash /
+/Giftcard /
+
+
+Ports open in production 
+wss://prod1.datameshgroup.io:4000
+5000 for POS
 
 -->
