@@ -6,8 +6,9 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - java: Java
 
 toc_footers:
-  - 2020-09-01
+  - 2020-09-13
   - <a href='https://www.datameshgroup.com'>DataMesh Group</a>
+  - <a href='https://github.com/datameshgroup'>GitHub</a>
 
 includes:
   - 00-introduction

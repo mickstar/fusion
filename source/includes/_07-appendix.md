@@ -40,13 +40,13 @@ Breaking changes when moving from "3.1" to "3.1-dmg"
 - For a successful payment, the acquirer STAN is returned in `PaymentResponse.PaymentResult.PaymentAcquirerData.STAN`. 
 - For a successful payment, the acquirer RRN is returned in `PaymentResponse.PaymentResult.PaymentAcquirerData.RRN`. 
 - POS should support the "3.1-dmg" `mandatory features checklist`
-  - Support for [purchase](#perform-a-purchase) and [refund](#perform-a-refund) payment types
-  - Include [product data](#product-data) in each payment request
+  - Support for [purchase](#cloud-api-reference-perform-a-purchase) and [refund](#cloud-api-reference-perform-a-refund) payment types
+  - Include [product data](#cloud-api-reference-product-data) in each payment request
   - Additional fields will be added to the message specification over time. To ensure forwards compatibility the Sale System must ignore when extra objects and fields are present in response messages. This includes valid MAC handling in the SecurityTrailer.
-  - Support for TLS and other [security requirements](#security-requirements)
+  - Support for TLS and other [security requirements](#cloud-api-reference-security-requirements)
   - [Settings user interface](#settings-user-interface)
   - [Payments user interface](#payment-user-interface) which handles the `Initial UI`, `Final UI`, and `cancelling a sale in progress`
-  - Handle error scenarios as outlined in [error handling](#error-handling)
+  - Handle error scenarios as outlined in [error handling](#cloud-api-reference-error-handling)
   - Ensure Sale System provides a unique [payment identification](#payment-identification)
 
 

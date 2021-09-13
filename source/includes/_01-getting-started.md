@@ -2,8 +2,8 @@
 
 The steps outlined below will guide you through creating a dev account, scoping your Sale System requirements based on the DataMesh functionality, coding and testing your integration, getting accredited with DataMesh and finally deploying your solution into production.
 
-1. [Create a test account](#create-a-test-account)
-1. [Design your integration](#design-your-integration)
+1. [Create a test account](#getting-started-create-a-test-account)
+1. [Design your integration](#getting-started-design-your-integration)
 1. [Code your POS integration](#cloud-api-reference)
 1. [POS accreditation](#testing)
 1. [Production deployment](#production)
@@ -12,15 +12,21 @@ The steps outlined below will guide you through creating a dev account, scoping 
 
 Integration into the DataMesh payment platform requires a DataMesh Satellite terminal, and a DataMesh Unify development account. 
 
-After creating your development account, you will be provided a `CertificationCode`. The `CertificationCode` is associated with a version of your Sale System software, and must be included in each transaction request sent from your Sale System.
-When certification is complete and the Sale System is ready for production deployment, DataMesh will provide a production `CertificationCode` to be included with the production Sale System.
+After creating your development account, you will be provided the following settings which are associated with a Sale System version. These settings must be included in each login request.
 
-Each Sale System lane is authenticated and authorised with a unique `SaleID` + `KEK` combination, and each POI Terminal is identified by a unique `POIID`. 
+- `ProviderIdentification`, the name of the busniess which creates the Sale System.
+- `ApplicationName`, the name of the Sale System.
+- `CertificationCode`, a GUID which uniquly identifies the Sale System. 
+- `SoftwareVersion`, the internal build version of this Sale System. DataMesh must configure this value on Unify. 
+	
+When the Sale System accreditation is complete and the Sale System is ready for production deployment, DataMesh will provide production settings to be included with the production Sale System build.
 
-DataMesh associates `SaleID` and `POIID` values on Unify to enforce access restrictions between specific Sale System lanes and terminals.
+Each Sale System lane is authenticated and authorised with a unique [SaleID](#data-dictionary-saleid) + [KEK](#data-dictionary-kek) combination, and each POI Terminal is identified by a unique [POIID](#data-dictionary-poiid). 
+
+DataMesh associates [SaleID](#data-dictionary-saleid) and [POIID](#data-dictionary-poiid) values on Unify to enforce access restrictions between specific Sale System lanes and terminals.
 
 When requesting a development account, let us know if you plan on working with multiple Sale System instances connected to the same terminal, or multiple terminals connected to one Sale System. 
-DataMesh will provide the correct number of `SaleID`, `KEK`, and `POIID` values and terminals, and ensure the correct associations are implemented on Unify. 
+DataMesh will provide the correct number of [SaleID](#data-dictionary-saleid), [KEK](#data-dictionary-kek), and [POIID](#data-dictionary-poiid) values and terminals, and ensure the correct associations are implemented on Unify. 
 
 You can request a terminal and a development account via [integrations@datameshgroup.com](mailto:integrations@datameshgroup.com)
 
@@ -41,25 +47,25 @@ You should refer to the accreditation [test script](#testing) as a guide to ensu
 
 Below is a an overview of the mandatory integration requirements.
 
-- Support for [purchase](#perform-a-purchase) and [refund](#perform-a-refund) payment types
-- Include [product data](#product-data) in each payment request
-- Support for TLS and other [security requirements](#security-requirements)
+- Support for [purchase](#cloud-api-reference-perform-a-purchase) and [refund](#cloud-api-reference-perform-a-refund) payment types
+- Include [product data](#getting-started-design-your-integration-product-data) in each payment request
+- Support for TLS and other [security requirements](#cloud-api-reference-security-requirements)
 - Additional fields will be added to the message specification over time. To ensure forwards compatibility the Sale System must ignore when extra objects and fields are present in response messages. This includes valid MAC handling in the SecurityTrailer.
-- [Settings user interface](#settings-user-interface)
-- [Payments user interface](#payment-user-interface) which handles the `Initial UI`, `Final UI`, `Display UI`, and `cancelling a sale in progress`
-- Handle error scenarios as outlined in [error handling](#error-handling)
-- Ensure Sale System provides a unique [payment identification](#payment-identification)
+- Implement [Sale System settings](#getting-started-design-your-integration-sale-system-settings) requirements
+- Implement [Payments user interface](#getting-started-design-your-integration-payment-user-interface) which handles the `Initial UI`, `Final UI`, `Display UI`, and `cancelling a sale in progress`
+- Handle error scenarios as outlined in [error handling](#cloud-api-reference-error-handling)
+- Ensure Sale System provides a unique [payment identification](#getting-started-design-your-integration-payment-identification)
 - Pass the accreditation [test script](#testing)
 
 **Other features**
 
-- [Dynamic Surcharge](#dynamic-surcharge)
-- [Tipping](#tipping)
-- Payments [user interface](#user-interface) for all displays and inputs
-- Sale System [receipt printing](#receipt-printing)
-- [Tokenisation](#tokenisation)
-- [Settlement](#settlement)
-- [Cash out](#cash-out)
+- [Dynamic Surcharge](#getting-started-design-your-integration-dynamic-surcharge)
+- [Tipping](#getting-started-design-your-integration-tipping)
+- Payments [user interface](#getting-started-design-your-integration-user-interface) for all displays and inputs
+- Sale System [receipt printing](#getting-started-design-your-integration-receipt-printing)
+- [Tokenisation](#getting-started-design-your-integration-tokenisation)
+- [Settlement](#getting-started-design-your-integration-settlement)
+- [Cash out](#getting-started-design-your-integration-cash-out)
 
 <aside class="success">
 For help on scoping your development work, or to discuss integration requirements, please contact the Data Mesh integrations team at <a href="mailto:integrations@datameshgroup.com">integrations@datameshgroup.com</a>
@@ -72,52 +78,80 @@ The payment lifecycle, including the required API requests, is outlined in the d
 
 1. Merchant launches the Sale System
 1. Sale System opens the websocket connection
-1. Sale System has the option to [link](#terminal-linking) with a POI Terminal by performing a [login request](#login) either: 
+1. Sale System has the option to [link](#terminal-linking) with a POI Terminal by performing a [login request](#cloud-api-reference-methods-login) either: 
   1. When the Sale System launches or
   1. Before the first payment request is sent
 1. Sale System receives a successful login response
 1. Merchant initiates a payment
-1. Sale System sends a [payment request](#payment)
-1. Sale System handles [display requests](#display), [print requests](#print), and [input requests](#input)
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment)
+1. Sale System handles [display requests](#cloud-api-reference-methods-display), [print requests](#cloud-api-reference-methods-print), and [input requests](#cloud-api-reference-methods-input)
 1. Sale System receives a payment response
 1. Merchant closes the Sale System
-1. Sale System can optionally send a [logout request](#logout)
+1. Sale System can optionally send a [logout request](#cloud-api-reference-methods-logout)
 1. Sale System closes the websocket
 
 ![](images/payment-lifecycle-basic.png)
 
 ### Terminal linking
 
-The POS (Sale System) communicates with a POI terminal using both a `SaleID` and `KEK` (which identifies the Sale System) and `POIID` (which identifies the terminal).
+The POS (Sale System) communicates with a POI terminal using both a [SaleID](#data-dictionary-saleid) and [KEK](#data-dictionary-kek) (which identifies the Sale System) and [POIID](#data-dictionary-poiid) (which identifies the terminal).
 
-Before a payment is processed, the Sale System must be 'linked' to a POI terminal by sending a [login](#login) request. 
+Before a payment is processed, the Sale System must be 'linked' to a POI terminal by sending a [login](#cloud-api-reference-methods-login) request. 
 
 It is possible for a Sale System to 'link' with multiple POI terminals, and for each POI terminal to be 'linked' to multiple Sale Systems. In this 
-instance the Sale System should record multiple `POIID` values and enable the operator to select the desired POI terminal as part of the payment flow.
+instance the Sale System should record multiple [POIID](#data-dictionary-poiid) values and enable the operator to select the desired POI terminal as part of the payment flow.
 
 <aside class="success">
 The Sale System must store the <code>KEK</code> in a secure location. 
 </aside>
 
 
-### Settings user interface
+### Sale System settings
 
-The Sale System must provide a user interface which allows the configuration of a `SaleID`, `KEK`, and `POIID` for each lane. 
+The Sale System must support configuration of both static Sale System settings, and cashier configurable settings.
 
-If the Sale System is to support many-to-one configuration (i.e. one Sale System linked to many POI terminals) it should support the entry of `SaleID` and `KEK` to identify the  Sale System lane, and a `POIID` for each POI terminal linked.
+#### Static Sale System settings
+
+Static Sale System settings are provided by DataMesh and are linked to the build of the Sale System. i.e. they will be the same for all merchants using the Sale System build.
+
+These settings can be contained in a database or configuration file editable by a Sale System engineer, or hard coded into the Sale System build. 
+
+Regardless of where they are stored, the Sale System must ensure the cashier or merchant is never required to configure the static settings, as they will not be aware of the required values. 
+
+DataMesh will provide two sets of static settings; one set for the test environment, and one set for production. It is the responsibility of the Sale System to ensure the correct values 
+are included in a test or production build. 
+
+The static Sale System settings are
+
+Attribute |Requ.| Format | Description |
+-----------------                        |----| ------ | ----------- |
+[ProviderIdentification](#data-dictionary-provideridentification)| ✔ | String | The name of the company supplying the Sale System. Provided by DataMesh. Sent in the login request.
+[ApplicationName](#data-dictionary-applicationname)          | ✔ | String | The name of the Sale System application. Provided by DataMesh. Sent in the login request.
+[SoftwareVersion](#data-dictionary-softwareversion)          | ✔ | String | Must indicate the software version of the current Sale System build. Sent in the login request.
+[CertificationCode](#data-dictionary-certificationcode)      | ✔ | String | Certification code for this Sale System. Provided by DataMesh. Sent in the login request.
+
+#### Cashier configurable settings
+
+The [SaleID](#data-dictionary-saleid), [KEK](#data-dictionary-kek), and [POIID](#data-dictionary-poiid) are cashier configurable settings which may be different for each lane.
+
+The Sale System must ensure there is a user interface accessible by the cashier which enables these settings to be configured.
+
+The [SaleID](#data-dictionary-saleid) and [POIID](#data-dictionary-poiid) should be visible to the cashier. The [KEK](#data-dictionary-kek) should be masked after entry by the cashier. 
+
+If the Sale System is to support many-to-one configuration (i.e. one Sale System linked to many POI terminals) it should support the entry of [SaleID](#data-dictionary-saleid) and [KEK](#data-dictionary-kek) to identify the  Sale System lane, and a [POIID](#data-dictionary-poiid) for each POI terminal linked.
 
 <aside class="success">
 A "pairing" API request will be available in a future API release which will enable the delivery of <code>SaleID</code>, <code>POIID</code>, and <code>KEK</code> to the Sale System in place of the manual entry of these data fields. 
 </aside>
 
-#### Example
+*Example setting UI*
 
 ![](images/settings-ui.png)
 
 
 ### Payment types
 
-Supported [payment](#payment) types are:
+Supported [payment](#cloud-api-reference-methods-payment) types are:
 
 - Purchase
 - Cash-Out
@@ -157,7 +191,7 @@ The POI Terminal will produce payment receipts which must be printed as a part o
 
 Some terminals have a built-in printer which can handle receipt printing. However, in order to support terminals without a built-in printer and improve the customer experience the Sale System should also handle printing receipts produced by the POI Terminal.
 
-To enable printing receipts from the Sale System, include "PrinterReceipt" in the list of available [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) when sending the [LoginRequest](#login). 
+To enable printing receipts from the Sale System, include "PrinterReceipt" in the list of available [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) when sending the [LoginRequest](#cloud-api-reference-methods-login). 
 
 <aside class="success">
 The Sale System must print the receipt as formatted by DataMesh and not create a custom formatted receipt.
@@ -211,13 +245,13 @@ The <code>Input UI</code> elements are not currently available, and will be supp
 </aside>
 
 
-If capable, the Sale System should present UI to the cashier for the duration of a payment. The content of the UI is set by the [input](#input) and [display](#display) request messages sent from the POI System.
+If capable, the Sale System should present UI to the cashier for the duration of a payment. The content of the UI is set by the [input](#cloud-api-reference-methods-input) and [display](#cloud-api-reference-methods-display) request messages sent from the POI System.
 
 In the examples presented below the UI is contained in a modal shadow box. This is an example to help illustrate how this UI may be implemented. The Sale System should implement this UI in a way that fits the look and feel of the rest of the system.
 
 The Sale System must not block communication with the POI System when displaying the payments UI. The POI System may send a display or input request, followed by another display or input request, or the payment response. For example, the POI System may send a "SELECT ACCOUNT" display, followed by a "PROCESSING" display when the card holder selects their account on the POI terminal. The POI System may send a "SIGNATURE APPROVED" input request, followed by a "TIMEOUT" display and payment response, if the cashier doesn't approve the signature in time.
 
-To enable display and input handling on the Sale System, [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) in the [login](#login) request contains "CashierStatus", "CashierError", "CashierInput", and "CustomerAssistance".
+To enable display and input handling on the Sale System, [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) in the [login](#cloud-api-reference-methods-login) request contains "CashierStatus", "CashierError", "CashierInput", and "CustomerAssistance".
 
 <aside class="success">
 The DataMesh Nexo API is event based. The Sale System sends a payment request, handles events as they are received, and eventually receives a payment response.
@@ -227,7 +261,7 @@ The DataMesh Nexo API is event based. The Sale System sends a payment request, h
 
 Whilst a payment is in progress the Sale System should present UI to the cashier which enables them to request a cancellation of the payment. 
 
-If the cashier initiates a payment cancellation, the Sale System sends an [abort transaction request](#abort-transaction) and continues to wait for the payment response. 
+If the cashier initiates a payment cancellation, the Sale System sends an [abort transaction request](#cloud-api-reference-methods-abort-transaction) and continues to wait for the payment response. 
 
 The Sale System may allow the cashier to continue to request cancellation of the payment until a payment result has been received.
 
@@ -237,7 +271,7 @@ There are a number of instances where the Terminal may be unable to cancel a pay
 
 #### Initial UI
 
-The Sale System should immediately display an initial UI after sending a [payment](#payment) request which informs the cashier the payment is in progress. This UI is required to handle instances where the first display/input message from the POI System is not present, or delayed.
+The Sale System should immediately display an initial UI after sending a [payment](#cloud-api-reference-methods-payment) request which informs the cashier the payment is in progress. This UI is required to handle instances where the first display/input message from the POI System is not present, or delayed.
 
 This UI should also enable the cashier to request a cancellation of the transaction.
 
@@ -262,26 +296,24 @@ This UI should also enable the cashier to request a cancellation of the transact
          "POIID":"xxx"
       },
       "DisplayRequest":{
-         "DisplayOutput":[
-            {
-               "ResponseRequiredFlag":false,
-               "Device":"CashierDisplay",
-               "InfoQualify":"Status",
-               "OutputContent":{
-                  "OutputFormat":"Text",
-                  "OutputText":{
-                     "Text":"LINE OF TEXT MAX 40 CHARACTERS"
-                  }
+         "DisplayOutput":{
+            "ResponseRequiredFlag":false,
+            "Device":"CashierDisplay",
+            "InfoQualify":"Status",
+            "OutputContent":{
+               "OutputFormat":"Text",
+               "OutputText":{
+                  "Text":"LINE OF TEXT MAX 40 CHARACTERS"
                }
-            }			
-         ]
+            }
+         }
       },
       "SecurityTrailer":{...}
    }
 }
 ```
 
-The POI system will send zero or more [display request](#display) messages to the Sale System during a transaction. The Sale System should display these messages and continue to wait for the payment response.
+The POI system will send zero or more [display request](#cloud-api-reference-methods-display) messages to the Sale System during a transaction. The Sale System should display these messages and continue to wait for the payment response.
 
 - Each display request will contain at least 1 line of text.
 - Each line of text will be up to 40 characters wide.
@@ -300,7 +332,7 @@ The POI system will send zero or more [display request](#display) messages to th
 The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
 </aside>
 
-The POI system will send zero or more [input request](#input) messages to the Sale System during a transaction. The Sale System should display these input requests, allow the cashier the option to answer the input request, and continue to wait for the payment response. The Sale System should not block on an input request, as the POI System may continue with the transaction before the Sale System has sent an input response.
+The POI system will send zero or more [input request](#cloud-api-reference-methods-input) messages to the Sale System during a transaction. The Sale System should display these input requests, allow the cashier the option to answer the input request, and continue to wait for the payment response. The Sale System should not block on an input request, as the POI System may continue with the transaction before the Sale System has sent an input response.
 
 
 - There are six types of input request. The [InputCommand](#data-dictionary-inputcommand) indicates which input request type the Sale System should present:
@@ -475,7 +507,7 @@ A cash out sale can be cash out only, or cash out + purchase.
 
 The Sale System can reconcile with the POI System periodically but should normally be once a day as it affects settlements with acquirers.
 
-Use the [Reconciliation](#reconciliation) request to initiate a settlement.
+Use the [Reconciliation](#cloud-api-reference-methods-reconciliation) request to initiate a settlement.
 
 ### Tokenisation
 
@@ -496,21 +528,21 @@ Two types of token can be requested:
 
 #### Tokenise a card used for a payment
 
-To tokenise a card as part of a [payment](#payment), set [SaleData.TokenRequestedType](#data-dictionary-tokenrequestedtype) in the payment request to "Transaction" or "Customer".
+To tokenise a card as part of a [payment](#cloud-api-reference-methods-payment), set [SaleData.TokenRequestedType](#data-dictionary-tokenrequestedtype) in the payment request to "Transaction" or "Customer".
 
 When [SaleData.TokenRequestedType](#data-dictionary-tokenrequestedtype) is set, the token will be returned as part of the payment response in [PaymentResult.PaymentInstrumentData.CardData.PaymentToken](#data-dictionary-paymenttoken).
 
 
 #### Tokenise a card without payment 
 
-The [card acquisition](#card-acquisition) request allows the Sale System to tokenise a card which can be used in future payment requests.
+The [card acquisition](#cloud-api-reference-methods-card-acquisition) request allows the Sale System to tokenise a card which can be used in future payment requests.
 
 
 <!-- TODO - need to validate how this works
 
 #### Use a token for a payment 
 
-To perform a [payment](#payment) request using a token: 
+To perform a [payment](#cloud-api-reference-methods-payment) request using a token: 
 
 - Populate [PaymentTransaction.OriginalPOITransaction](#data-dictionary-originalpoitransaction) with details of the sale used to acquire the token
 - Set [PaymentTransaction.OriginalPOITransaction.ReuseCardDataFlag](#reusecarddataflag) to true
@@ -522,11 +554,11 @@ To perform a [payment](#payment) request using a token:
 
 ### Split payments
 
-To perform a split payment, the Sale System should send multiple [payment](#payment) requests, one for each split. 
+To perform a split payment, the Sale System should send multiple [payment](#cloud-api-reference-methods-payment) requests, one for each split. 
 
 Split is allowed when [PaymentType](#data-dictionary-paymenttype) is "Normal".
 
-The following data elements should be set by the Sale System for a split payment in a [payment](#payment) request:
+The following data elements should be set by the Sale System for a split payment in a [payment](#cloud-api-reference-methods-payment) request:
 
 - All split payments which are part of the same sale should include the same [SaleData.SaleTransactionID](#data-dictionary-saletransactionid). 
 - [PaymentTransaction.SaleItem](#data-dictionary-saleitem) array, which may reflect
@@ -564,7 +596,7 @@ For example:
 1. Cashier prints a sale ticket for $100 and presents to the card holder
 1. Card holder signs and writes a tip of $10
 1. Cashier opens $100 sale on the Sale System, enters tip of $10 and initiates payment
-1. Sale System sends a [payment request](#payment) request to the POI Terminal and sets
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment) request to the POI Terminal and sets
   - [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount) to $110 (sale amount + tip)
   - [PaymentTransaction.AmountsReq.TipAmount](#tipamount) to $10
 1. POI Terminal processes a payment of $110 and includes tip amount on the payment receipt
@@ -577,7 +609,7 @@ When tipping on the POI Terminal, the Sale System sends the payment request to t
 For example: 
 
 1. Cashier opens $100 sale on the Sale System and initiates payment
-1. Sale System sends a [payment request](#payment) request to the POI Terminal and sets
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment) request to the POI Terminal and sets
   - [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount) to $110 (sale amount + tip)
   - [PaymentTransaction.AmountsReq.TipAmount](#tipamount) to $0
 1. POI Terminal presents UI to the card holder which allows them to enter a tip
@@ -607,7 +639,7 @@ Dynamic surcharge example:
 
 1. Merchant enables dynamic surcharge on Unify for their terminal fleet and configures a 1.9% surcharge on Amex/Diners cards
 1. Cashier opens $100 sale on the Sale System and initiates payment
-1. Sale System sends a [payment request](#payment) request to the POI Terminal and sets [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount) to $100
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment) request to the POI Terminal and sets [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount) to $100
 1. Card holder presents their Amex card
 1. POI Terminal calcualtes new total based on the card type and processes a payment of $101.90 
 1. POI Terminal approves payment and returns the result to the Sale System with 

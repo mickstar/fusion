@@ -124,7 +124,9 @@ Available values:
 
 ## ApplicationName
 
-The name of the Sale System application
+The name of the Sale System application.
+
+DataMesh will provide a `ApplicationName` to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a `ApplicationName` to be included in the production build of the Sale System. 
 
 ## CardBrand
 
@@ -159,7 +161,9 @@ SaleItem with multiple categories | `{ "categories": [ "Computers", "Accessories
 
 ## CertificationCode
 
-Certification code for this Sale System provided by Data Mesh
+Certification code for this Sale System.
+
+DataMesh will provide a `CertificationCode` to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a `CertificationCode` to be included in the production build of the Sale System. 
 
 ## DateTime
 
@@ -404,9 +408,9 @@ Type of message of the Sale to POI protocol. Available values:
 
 ## OperatorId
 
-An optional value sent in the [Login Request](#login) for information only. Used to identify the cashier using the Sale Terminal during the session.
+An optional value sent in the [Login Request](#cloud-api-reference-methods-login) for information only. Used to identify the cashier using the Sale Terminal during the session.
 
-If present, totals in the [ReconciliationResponse](#reconciliation) will be grouped by this value. If not present, payment transactions that do not specify a `OperatorId` will not be grouped under a `OperatorId`.
+If present, totals in the [ReconciliationResponse](#cloud-api-reference-methods-reconciliation) will be grouped by this value. If not present, payment transactions that do not specify a `OperatorId` will not be grouped under a `OperatorId`.
 
 Note that different cashiers may still transact during the same login session by setting an `OperatorId` per payment. 
 
@@ -445,7 +449,13 @@ Label                | Description
 
 ## PaymentBrand
 
-Identifies the payment brand used for a payment. Available values:
+Identifies the payment brand used for a payment. 
+
+<aside class="notice">
+Please note that this list may expand in the future as new payment types are added. 
+</aside>
+
+Available values:
 
 - "VISA"
 - "Mastercard"
@@ -458,7 +468,7 @@ Identifies the payment brand used for a payment. Available values:
 - "Debit"
 - "AliPay"
 - "WeChat Pay"
-- "Other"
+- "Card"
 
 ## PaymentCurrency
 
@@ -544,7 +554,9 @@ Label                | Description
 
 ## ProviderIdentification
 
-The name of the company supplying the Sale System
+The name of the company supplying the Sale System. 
+
+DataMesh will provide a `ProviderIdentification` to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a `ProviderIdentification` to be included in the production build of the Sale System. 
 
 
 ## PaymentInstrumentData
@@ -1072,7 +1084,7 @@ A globally unique value, used to link a related series of transactions.
 
 For example, a pre-authorisation, followed by a pre-authorisation top-up, and then a completion all require the same `SaleReferenceID` in the request.
 
-The Sale System must ensure the `SaleReferenceID` is unique across all `SaleId`'s and `POIID`'s across the merchant. If Sale Systems are not synchronised, it is recommended that this value should be a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) to ensure uniqueness.
+The Sale System must ensure the `SaleReferenceID` is unique across all [SaleID](#data-dictionary-saleid)'s and [POIID](#data-dictionary-poiid)'s across the merchant. If Sale Systems are not synchronised, it is recommended that this value should be a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) to ensure uniqueness.
 
 
 ## SaleTransactionID
@@ -1090,9 +1102,9 @@ Contains the following fields:
 
 ## ShiftNumber
 
-An optional value sent in the [Login Request](#login) for information only. Used to identify the shift that drives the Sale Terminal during the session.
+An optional value sent in the [Login Request](#cloud-api-reference-methods-login) for information only. Used to identify the shift that drives the Sale Terminal during the session.
 
-If present, totals in the [ReconciliationResponse](#reconciliation) will be grouped by this value. If not present, payment transactions that do not specify a `ShiftNumber` will not be grouped under a `ShiftNumber`.
+If present, totals in the [ReconciliationResponse](#cloud-api-reference-methods-reconciliation) will be grouped by this value. If not present, payment transactions that do not specify a `ShiftNumber` will not be grouped under a `ShiftNumber`.
 
 Note that different shifts may still occur during the same login session by setting a `ShiftNumber` per payment. 
 
@@ -1105,11 +1117,13 @@ The `ServiceID` of the message response is mirrored from the `ServiceID` in the 
 
 The POI System will validate that the `ServiceID` is different from the previous request. The Sale System should validate that the `ServiceID` in the response matches the `ServiceID` sent in the request.
 
-The `ServiceID` is used to identify a transaction to retrieve in a [transaction status](#transaction-status) request. 
+The `ServiceID` is used to identify a transaction to retrieve in a [transaction status](#cloud-api-reference-methods-transaction-status) request. 
 
 ## SoftwareVersion
 
-The software version of the Sale System
+The software version of the Sale System.
+
+Must be the software version of the current Sale System build. 
 
 ## SplitPaymentFlag
 

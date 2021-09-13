@@ -28,7 +28,7 @@ Unify utilises secure websockets for communication between Sale System and POI S
   - If certificate validation fails the Sale System must display an error and drop the connection.
 - The Sale System must resolve the DNS address before each connection attempt, and never hard code IP addresses
 - The Sale System should manage SSL certificate revocation lists and ensure OS security updates are applied
-- The Sale System should store the `SaleID`, `POIID`, and `KEK` in a secure location. These values are used to identify the Sale System and authenticate the [SecurityTrailer](#securitytrailer)
+- The Sale System should store the [SaleID](#data-dictionary-saleid), [POIID](#data-dictionary-poiid), and [KEK](#data-dictionary-kek) in a secure location. These values are used to identify the Sale System and authenticate the [SecurityTrailer](#securitytrailer)
 
 <!--  - Unify utilises one of the root CA's provided by [Sectigo](https://sectigo.com/resource-library/sectigo-root-intermediate-certificate-files) and [Digicert](https://www.digicert.com/kb/digicert-root-certificates.htm). The Sale System must ensure all certificate authorities from these sources are loaded into the certificate store used to validate the server. 
   - A full list of ca files can be downloaded from [here](files/root-ca-list.zip). -->
@@ -138,8 +138,8 @@ Attribute                             |Requ.| Format | Description |
 [MessageCategory](#data-dictionary-messagecategory)   | ✔ | String | Indicates the category of message. Possible values are "CardAcquisition", "Display", "Login", "Logout", "Payment" 
 [MessageType](#data-dictionary-messagetype)           | ✔ | String | Type of message. Possible values are "Request", "Response", or "Notification"
 [ServiceID](#data-dictionary-serviceid)               | ✔ | String | A unique value which will be mirrored in the response. See [ServiceID](#data-dictionary-serviceid).
-[SaleID](#data-dictionary-saleid)                     | ✔ | String | Uniquely identifies the Sale System. The `SaleID` is provided by DataMesh, and must match the SaleID configured in Unify.
-[POIID](#data-dictionary-poiid)                       | ✔ | String | Uniquely identifies the POI Terminal. The `POIID` is provided by DataMesh, and must match the POIID configured in Unify. For Sale Systems that do not need a POI Terminal, the value must be "POI Server"
+[SaleID](#data-dictionary-saleid)                     | ✔ | String | Uniquely identifies the Sale System. The [SaleID](#data-dictionary-saleid) is provided by DataMesh, and must match the SaleID configured in Unify.
+[POIID](#data-dictionary-poiid)                       | ✔ | String | Uniquely identifies the POI Terminal. The [POIID](#data-dictionary-poiid) is provided by DataMesh, and must match the POIID configured in Unify. For Sale Systems that do not need a POI Terminal, the value must be "POI Server"
 
  
 ### Payload
@@ -186,7 +186,7 @@ The [Cloud API Reference](#cloud-api-reference) outlines the expected payload fo
 
 A `SecurityTrailer` object is included with each request and response. 
 
-Unify authenticates requests from the Sale System by examining the `SecurityTrailer`, along with the `SaleID`, `POIID`, and `CertificationCode`
+Unify authenticates requests from the Sale System by examining the `SecurityTrailer`, along with the [SaleID](#data-dictionary-saleid), [POIID](#data-dictionary-poiid), and `CertificationCode`
 
 Session Keys are used to generate/verify a Message Authentication Code (MAC) to prove the authenticity of transactions. They are also used to protect Sensitive Card Data if sent from the Sale System. Session keys must change for every message.
 
@@ -220,59 +220,55 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 
 ## Perform a purchase
 
-To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Normal"
   - Set the purchase amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - Populate the [SaleItem](#data-dictionary-saleitem) array with the product basket for the transaction 
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Check [Response.Result](#data-dictionary-result) for the transaction result 
-  - If [Response.Result](#data-dictionary-result) is "Success", record the following to enable future matched refunds:
-    - [SaleID](#data-dictionary-saleid)
-	- [POIID](#data-dictionary-poiid)
-	- [POITransactionID](#data-dictionary-poitransactionid)
+  - If [Response.Result](#data-dictionary-result) is "Success", record the following to enable future matched refunds: [SaleID](#data-dictionary-saleid), [POIID](#data-dictionary-poiid), and [POITransactionID](#data-dictionary-poitransactionid)
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - If the Sale System is handling tipping or surcharge, check the [PaymentResult.AmountsResp.TipAmount](#tipamount), and [PaymentResult.AmountsResp.SurchargeAmount](#surchargeamount)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 
 ## Perform a refund
 
 <!-- TODO need to add support here for matched refunds -->
 
-To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
-In most cases the Sale System should attempt to 
-//
+If refunding a previous purchase, the Sale System should include details of the original purchase. 
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Refund"
   - Set the refund amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - If refunding a previous purchase, set the following fields in [PaymentTransaction.OriginalPOITransaction](#data-dictionary-originalpoitransaction)
-    - Set [SaleID](#data-dictionary-saleid) to the `SaleId` of the original purchase payment request 
-	- Set [POIID](#data-dictionary-poiid) to the `POIID` of the original purchase payment request 
+    - Set [SaleID](#data-dictionary-saleid) to the [SaleID](#data-dictionary-saleid) of the original purchase payment request 
+	- Set [POIID](#data-dictionary-poiid) to the [POIID](#data-dictionary-poiid) of the original purchase payment request 
 	- Set [POITransactionID](#data-dictionary-poitransactionid) to the value returned in [POIData.POITransactionID](#data-dictionary-poitransactionid) of the original purchase payment response 
     - The product basket is not required for refunds
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
@@ -280,7 +276,7 @@ In most cases the Sale System should attempt to
   - Check [Response.Result](#data-dictionary-result) for the transaction result 
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 
 ## Methods
@@ -350,18 +346,18 @@ sending another NEXO Login request.
 **LoginRequest**
 
 <div style="width:180px">Attribute</div>     |Requ.| Format | Description |
------------------                            |----| ------ | ----------- |
+-----------------                            |---- | ------ | ----------- |
 [DateTime](#data-dictionary-datetime)                        | ✔ | String | Current Sale System time, formatted as [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) DateTime. e.g. "2019-09-02T09:13:51.0+01:00"   
 **SaleSoftware**                            | ✔ | Object | Object containing Sale System identification
- [ProviderIdentification](#data-dictionary-provideridentification)| ✔ | String | The name of the company supplying the Sale System 
- [ApplicationName](#data-dictionary-applicationname)          | ✔ | String | The name of the Sale System application
- [SoftwareVersion](#data-dictionary-softwareversion)          | ✔ | String | The software version of the Sale System
- [CertificationCode](#data-dictionary-certificationcode)      | ✔ | String | Certification code for this Sale System provided by DataMesh
+ [ProviderIdentification](#data-dictionary-provideridentification)| ✔ | String | The name of the company supplying the Sale System. Provided by DataMesh.
+ [ApplicationName](#data-dictionary-applicationname)          | ✔ | String | The name of the Sale System application. Provided by DataMesh.
+ [SoftwareVersion](#data-dictionary-softwareversion)          | ✔ | String | The software version of the Sale System. Must be the software version of the current build. 
+ [CertificationCode](#data-dictionary-certificationcode)      | ✔ | String | Certification code for this Sale System. Provided by DataMesh.
 **SaleTerminalData**                          | ✔ | Object | Object containing Sale System configuration 
  [TerminalEnvironment](#data-dictionary-terminalenvironment)  | ✔ | String | "Attended", "SemiAttended", or "Unattended"
  [SaleCapabilities](#data-dictionary-salecapabilities)        | ✔ | Array | Advises the POI System of the Sale System capabilities. See [SaleCapabilities](#data-dictionary-salecapabilities) 
  [TotalsGroupId](#data-dictionary-totalsgroupid)              |  | String | Groups transactions in a login session
-[OperatorLanguage](#operatorlanguage)         | ✔ | String | Operator language. Set to 'en'
+[OperatorLanguage](#operatorlanguage)         |   | String | Operator language. Set to 'en'
 [OperatorId](#data-dictionary-operatorid)                     |  | String | Groups transactions under this operator id
 [ShiftNumber](#data-dictionary-shiftnumber)                   |  | String | Groups transactions under this shift number
 [POISerialNumber](#data-dictionary-poiserialnumber)           |  | String | The POISerialNumber from the last login response, or absent if this is the first login 
@@ -736,7 +732,7 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
 -----------------                            |----| ------ | ----------- |
 **SaleData**                                 | ✔ | Object | Sale System information attached to this payment
  [OperatorID](#data-dictionary-operatorid)                   |   | String | Only required if different from Login Request
- [OperatorLanguage](#operatorlanguage)       | ✔ | String | Set to "en"
+ [OperatorLanguage](#operatorlanguage)       |   | String | Set to "en"
  [ShiftNumber](#data-dictionary-shiftnumber)                 |   | String | Only required if different from Login Request
  [SaleReferenceID](#data-dictionary-salereferenceid)         |  | String | Mandatory for pre-authorisation and completion, otherwise optional. See [SaleReferenceID](#data-dictionary-salereferenceid)
  [TokenRequestedType](#data-dictionary-tokenrequestedtype)   |  | String | If present, indicates which type of token should be created for this payment. See [TokenRequestedType](#data-dictionary-tokenrequestedtype)
@@ -757,8 +753,8 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
   [MaximumCashBackAmount](#maximumcashbackamount)|  | Decimal | Available if `CashBackAmount` is not present. If present, the POI Terminal prompts for the cash back amount up to a maximum of `MaximumCashBackAmount`
   [MinimumSplitAmount](#minimumsplitamount)  |   | Decimal | Present only if the POI Terminal can process an amount < `RequestedAmount` as a split amount. Limits the minimum split amount allowed.
  **[OriginalPOITransaction](#data-dictionary-originalpoitransaction)** |  | Object | Identifies a previous POI transaction. Mandatory for Refund and Completion. See [OriginalPOITransaction](#data-dictionary-originalpoitransaction)
-  [SaleID](#data-dictionary-saleid)                          | ✔ | String | `SaleID` which performed the original transaction
-  [POIID](#data-dictionary-poiid)                            | ✔ | String | `POIID` which performed the original transaction
+  [SaleID](#data-dictionary-saleid)                          | ✔ | String | [SaleID](#data-dictionary-saleid) which performed the original transaction
+  [POIID](#data-dictionary-poiid)                            | ✔ | String | [POIID](#data-dictionary-poiid) which performed the original transaction
   **POITransactionID**                       | ✔ | Object | 
    [TransactionID](#data-dictionary-transactionid)           | ✔ | String | `TransactionID` from the original transaction
    [TimeStamp](#data-dictionary-timestamp)                   | ✔ | String | `TimeStamp` from the original transaction
@@ -991,19 +987,17 @@ Follow the [user interface](#user-interface) guide for details on how to impleme
          "POIID":"xxx"
       },
       "DisplayRequest":{
-         "DisplayOutput":[
-            {
-               "ResponseRequiredFlag":false,
-               "Device":"CashierDisplay",
-               "InfoQualify":"xxx",
-               "OutputContent":{
-                  "OutputFormat":"Text",
-                  "OutputText":{
-                     "Text":"xxx"
-                  }
+         "DisplayOutput":{
+            "ResponseRequiredFlag":false,
+            "Device":"CashierDisplay",
+            "InfoQualify":"xxx",
+            "OutputContent":{
+               "OutputFormat":"Text",
+               "OutputText":{
+                  "Text":"xxx"
                }
             }
-         ]
+         }
       },
       "SecurityTrailer":{...}
    }
@@ -1024,14 +1018,14 @@ Follow the [user interface](#user-interface) guide for details on how to impleme
 
 **DisplayRequest**
 
-<div style="width:180px">Attribute</div>      |Requ.| Format | Description |
------------------                             |----| ------ | ----------- |
-**DisplayOutput**                             | ✔ | Array | Array [1..6] of objects which represents the display 
+<div style="width:180px">Attribute</div>                  |Requ.| Format | Description |
+-----------------                                         |----| ------ | ----------- |
+**DisplayOutput**                                         | ✔ | Object | Object which represents the display 
  [ResponseRequiredFlag](#data-dictionary-responserequiredflag)|  | Boolean | Indicates if the POI System requires a `DisplayResponse` to be sent for this `DisplayRequest`
- [Device](#device)                            | ✔ | String | "CashierDisplay"
- [InfoQualify](#data-dictionary-infoqualify)                  | ✔ | String | "Status" or "Error". See [InfoQualify](#data-dictionary-infoqualify)
- [OutputFormat](#data-dictionary-outputformat)                | ✔ | String | "Text"
- [Text](#text)                                | ✔ | String | Single line of text to display
+ [Device](#device)                                        | ✔ | String | "CashierDisplay"
+ [InfoQualify](#data-dictionary-infoqualify)              | ✔ | String | "Status" or "Error". See [InfoQualify](#data-dictionary-infoqualify)
+ [OutputFormat](#data-dictionary-outputformat)            | ✔ | String | "Text"
+ [Text](#text)                                            | ✔ | String | Single line of text to display
 
 #### Display response
 
@@ -1085,7 +1079,7 @@ The Sale System is expected to send a `DisplayResponse` if one or more displays 
 
 <div style="width:180px">Attribute</div>      |Requ.| Format | Description |
 -----------------                             |----| ------ | ----------- |
-*OutputResult*                                | ✔ | Array | Array [1..6]. One object per Device/InfoQualify pair of values where corresponding `ResponseRequiredFlag` in the `DisplayRequest` is set to true.
+*OutputResult*                                | ✔ | Object | Response for Device/InfoQualify pair where corresponding `ResponseRequiredFlag` in the `DisplayRequest` is set to true.
  [Device](#device)                            | ✔ | String | Mirrored from display request
  [InfoQualify](#data-dictionary-infoqualify)                  | ✔ | String | Mirrored from display request
  [Result](#data-dictionary-result)                            | ✔ | String | "Success", "Partial", or "Failure". See [Result](#data-dictionary-result).
@@ -1096,6 +1090,11 @@ The Sale System is expected to send a `DisplayResponse` if one or more displays 
 
 
 ### Input
+
+<aside class="warning">
+The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
+</aside>
+
 
 During a payment, the POI System will input requests to the Sale System if cashier interaction is required (e.g. signature approved yes/no)
 
@@ -1676,7 +1675,7 @@ However, if the Abort Request cannot be accepted due to a message format error o
 <div style="width:180px">Attribute</div>      |Requ.| Format  | Description |
 -----------------                             |----| ------ | ----------- |
 [ReconciliationType](#reconciliationtype)     | ✔ | String | "SaleReconciliation" to close the current period, "PreviousReconciliation" to request the result of a previous reconciliation
-[POIReconciliationID](#data-dictionary-poireconciliationid)   | ✔ | String | Present if ReconciliationType is "PreviousReconciliation". See [POIReconciliationID](#data-dictionary-poireconciliationid)
+[POIReconciliationID](#data-dictionary-poireconciliationid)   |   | String | Present if ReconciliationType is "PreviousReconciliation". See [POIReconciliationID](#data-dictionary-poireconciliationid)
 
 
 #### Reconciliation response
@@ -1938,7 +1937,7 @@ In the event the Sale System does not receive a response (for example, due to ne
 Error handling due to network error or timeout is outlined in the diagram below. 
 
 1. Cashier initiates a payment
-1. Sale System sends a [payment request](#payment)
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment)
 1. Network error or timeout occurs
 1. Sale System awaits Internet availability
 1. Sale System enters a loop for a maximum of 90 seconds
@@ -1961,7 +1960,7 @@ The Sale System can handle a power failure by checking a local transaction statu
 
 1. Cashier initiates a payment
 1. Sale System sets txn_in_progress flag
-1. Sale System sends a [payment request](#payment)
+1. Sale System sends a [payment request](#cloud-api-reference-methods-payment)
 1. Sale System power failure occurs
 1. Sale System start up after power failure
 1. Sale System checks if txn_in_progress flag is set. If so, enter error handling

@@ -152,20 +152,20 @@ The [Satellite API Reference](#satellite-api-reference) outlines the expected pa
 <!-- 
 ## Perform a purchase
 
-To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Normal"
   - Set the purchase amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - Populate the [SaleItem](#data-dictionary-saleitem) array with the product basket for the transaction 
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
@@ -178,31 +178,31 @@ To perform a purchase the Sale System will need to implement requests, and handl
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - If the Sale System is handling tipping or surcharge, check the [PaymentResult.AmountsResp.TipAmount](#tipamount), and [PaymentResult.AmountsResp.SurchargeAmount](#surchargeamount)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 
 ## Perform a refund
 
-To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
 In most cases the Sale System should attempt to 
 //
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Refund"
   - Set the refund amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - If refunding a previous purchase, set the following fields in [PaymentTransaction.OriginalPOITransaction](#data-dictionary-originalpoitransaction)
-    - Set [SaleID](#data-dictionary-saleid) to the `SaleId` of the original purchase payment request 
-	- Set [POIID](#data-dictionary-poiid) to the `POIID` of the original purchase payment request 
+    - Set [SaleID](#data-dictionary-saleid) to the [SaleID](#data-dictionary-saleid) of the original purchase payment request 
+	- Set [POIID](#data-dictionary-poiid) to the [POIID](#data-dictionary-poiid) of the original purchase payment request 
 	- Set [POITransactionID](#data-dictionary-poitransactionid) to the value returned in [POIData.POITransactionID](#data-dictionary-poitransactionid) of the original purchase payment response 
     - The product basket is not required for refunds
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
@@ -210,7 +210,7 @@ In most cases the Sale System should attempt to
   - Check [Response.Result](#data-dictionary-result) for the transaction result 
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 -->
 
@@ -390,7 +390,7 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
 -----------------                            |----| ------ | ----------- |
 **SaleData**                                 | ✔ | Object | Sale System information attached to this payment
  [OperatorID](#data-dictionary-operatorid)                   |   | String | Only required if different from Login Request
- [OperatorLanguage](#operatorlanguage)       | ✔ | String | Set to "en"
+ [OperatorLanguage](#operatorlanguage)       |   | String | Set to "en"
  [ShiftNumber](#data-dictionary-shiftnumber)                 |   | String | Only required if different from Login Request
  [SaleReferenceID](#data-dictionary-salereferenceid)         |  | String | Mandatory for pre-authorisation and completion, otherwise optional. See [SaleReferenceID](#data-dictionary-salereferenceid)
  [TokenRequestedType](#data-dictionary-tokenrequestedtype)   |  | String | If present, indicates which type of token should be created for this payment. See [TokenRequestedType](#data-dictionary-tokenrequestedtype)
@@ -411,8 +411,8 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
   [MaximumCashBackAmount](#maximumcashbackamount)|  | Decimal | Available if `CashBackAmount` is not present. If present, the POI Terminal prompts for the cash back amount up to a maximum of `MaximumCashBackAmount`
   [MinimumSplitAmount](#minimumsplitamount)  |   | Decimal | Present only if the POI Terminal can process an amount < `RequestedAmount` as a split amount. Limits the minimum split amount allowed.
  **[OriginalPOITransaction](#data-dictionary-originalpoitransaction)** |  | Object | Identifies a previous POI transaction. Mandatory for Refund and Completion. See [OriginalPOITransaction](#data-dictionary-originalpoitransaction)
-  [SaleID](#data-dictionary-saleid)                          | ✔ | String | `SaleID` which performed the original transaction
-  [POIID](#data-dictionary-poiid)                            | ✔ | String | `POIID` which performed the original transaction
+  [SaleID](#data-dictionary-saleid)                          | ✔ | String | [SaleID](#data-dictionary-saleid) which performed the original transaction
+  [POIID](#data-dictionary-poiid)                            | ✔ | String | [POIID](#data-dictionary-poiid) which performed the original transaction
   **POITransactionID**                       | ✔ | Object | 
    [TransactionID](#data-dictionary-transactionid)           | ✔ | String | `TransactionID` from the original transaction
    [TimeStamp](#data-dictionary-timestamp)                   | ✔ | String | `TimeStamp` from the original transaction
