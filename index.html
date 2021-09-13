@@ -330,7 +330,7 @@
 							<a href="#getting-started-design-your-integration-terminal-linking" class="toc-h3 toc-link" data-title="Terminal linking">Terminal linking</a>
 						  </li>
 						  <li>
-							<a href="#getting-started-design-your-integration-settings-user-interface" class="toc-h3 toc-link" data-title="Settings user interface">Settings user interface</a>
+							<a href="#getting-started-design-your-integration-sale-system-settings" class="toc-h3 toc-link" data-title="Sale System settings">Sale System settings</a>
 						  </li>
 						  <li>
 							<a href="#getting-started-design-your-integration-payment-types" class="toc-h3 toc-link" data-title="Payment types">Payment types</a>
@@ -835,8 +835,9 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li>2020-09-01</li>
+            <li>2020-09-13</li>
             <li><a href='https://www.datameshgroup.com'>DataMesh Group</a></li>
+            <li><a href='https://github.com/datameshgroup'>GitHub</a></li>
         </ul>
     </div>
     <div class="page-wrapper">
@@ -906,8 +907,8 @@ wss://prod1.datameshgroup.io:4000
 <p>The steps outlined below will guide you through creating a dev account, scoping your Sale System requirements based on the DataMesh functionality, coding and testing your integration, getting accredited with DataMesh and finally deploying your solution into production.</p>
 
 <ol>
-<li><a href="#create-a-test-account">Create a test account</a></li>
-<li><a href="#design-your-integration">Design your integration</a></li>
+<li><a href="#getting-started-create-a-test-account">Create a test account</a></li>
+<li><a href="#getting-started-design-your-integration">Design your integration</a></li>
 <li><a href="#cloud-api-reference">Code your POS integration</a></li>
 <li><a href="#testing">POS accreditation</a></li>
 <li><a href="#production">Production deployment</a></li>
@@ -915,15 +916,23 @@ wss://prod1.datameshgroup.io:4000
 <h2 id='getting-started-create-a-test-account'>Create a test account</h2>
 <p>Integration into the DataMesh payment platform requires a DataMesh Satellite terminal, and a DataMesh Unify development account. </p>
 
-<p>After creating your development account, you will be provided a <code>CertificationCode</code>. The <code>CertificationCode</code> is associated with a version of your Sale System software, and must be included in each transaction request sent from your Sale System.
-When certification is complete and the Sale System is ready for production deployment, DataMesh will provide a production <code>CertificationCode</code> to be included with the production Sale System.</p>
+<p>After creating your development account, you will be provided the following settings which are associated with a Sale System version. These settings must be included in each login request.</p>
 
-<p>Each Sale System lane is authenticated and authorised with a unique <code>SaleID</code> + <code>KEK</code> combination, and each POI Terminal is identified by a unique <code>POIID</code>. </p>
+<ul>
+<li><code>ProviderIdentification</code>, the name of the busniess which creates the Sale System.</li>
+<li><code>ApplicationName</code>, the name of the Sale System.</li>
+<li><code>CertificationCode</code>, a GUID which uniquly identifies the Sale System. </li>
+<li><code>SoftwareVersion</code>, the internal build version of this Sale System. DataMesh must configure this value on Unify. </li>
+</ul>
 
-<p>DataMesh associates <code>SaleID</code> and <code>POIID</code> values on Unify to enforce access restrictions between specific Sale System lanes and terminals.</p>
+<p>When the Sale System accreditation is complete and the Sale System is ready for production deployment, DataMesh will provide production settings to be included with the production Sale System build.</p>
+
+<p>Each Sale System lane is authenticated and authorised with a unique <a href="#data-dictionary-saleid">SaleID</a> + <a href="#data-dictionary-kek">KEK</a> combination, and each POI Terminal is identified by a unique <a href="#data-dictionary-poiid">POIID</a>. </p>
+
+<p>DataMesh associates <a href="#data-dictionary-saleid">SaleID</a> and <a href="#data-dictionary-poiid">POIID</a> values on Unify to enforce access restrictions between specific Sale System lanes and terminals.</p>
 
 <p>When requesting a development account, let us know if you plan on working with multiple Sale System instances connected to the same terminal, or multiple terminals connected to one Sale System. 
-DataMesh will provide the correct number of <code>SaleID</code>, <code>KEK</code>, and <code>POIID</code> values and terminals, and ensure the correct associations are implemented on Unify. </p>
+DataMesh will provide the correct number of <a href="#data-dictionary-saleid">SaleID</a>, <a href="#data-dictionary-kek">KEK</a>, and <a href="#data-dictionary-poiid">POIID</a> values and terminals, and ensure the correct associations are implemented on Unify. </p>
 
 <p>You can request a terminal and a development account via <a href="mailto:integrations@datameshgroup.com">integrations@datameshgroup.com</a></p>
 <h2 id='getting-started-design-your-integration'>Design your integration</h2>
@@ -942,27 +951,27 @@ This section will make reference to methods and data structures documented in th
 <p>Below is a an overview of the mandatory integration requirements.</p>
 
 <ul>
-<li>Support for <a href="#perform-a-purchase">purchase</a> and <a href="#perform-a-refund">refund</a> payment types</li>
-<li>Include <a href="#product-data">product data</a> in each payment request</li>
-<li>Support for TLS and other <a href="#security-requirements">security requirements</a></li>
+<li>Support for <a href="#cloud-api-reference-perform-a-purchase">purchase</a> and <a href="#cloud-api-reference-perform-a-refund">refund</a> payment types</li>
+<li>Include <a href="#getting-started-design-your-integration-product-data">product data</a> in each payment request</li>
+<li>Support for TLS and other <a href="#cloud-api-reference-security-requirements">security requirements</a></li>
 <li>Additional fields will be added to the message specification over time. To ensure forwards compatibility the Sale System must ignore when extra objects and fields are present in response messages. This includes valid MAC handling in the SecurityTrailer.</li>
-<li><a href="#settings-user-interface">Settings user interface</a></li>
-<li><a href="#payment-user-interface">Payments user interface</a> which handles the <code>Initial UI</code>, <code>Final UI</code>, <code>Display UI</code>, and <code>cancelling a sale in progress</code></li>
-<li>Handle error scenarios as outlined in <a href="#error-handling">error handling</a></li>
-<li>Ensure Sale System provides a unique <a href="#payment-identification">payment identification</a></li>
+<li>Implement <a href="#getting-started-design-your-integration-sale-system-settings">Sale System settings</a> requirements</li>
+<li>Implement <a href="#getting-started-design-your-integration-payment-user-interface">Payments user interface</a> which handles the <code>Initial UI</code>, <code>Final UI</code>, <code>Display UI</code>, and <code>cancelling a sale in progress</code></li>
+<li>Handle error scenarios as outlined in <a href="#cloud-api-reference-error-handling">error handling</a></li>
+<li>Ensure Sale System provides a unique <a href="#getting-started-design-your-integration-payment-identification">payment identification</a></li>
 <li>Pass the accreditation <a href="#testing">test script</a></li>
 </ul>
 
 <p><strong>Other features</strong></p>
 
 <ul>
-<li><a href="#dynamic-surcharge">Dynamic Surcharge</a></li>
-<li><a href="#tipping">Tipping</a></li>
-<li>Payments <a href="#user-interface">user interface</a> for all displays and inputs</li>
-<li>Sale System <a href="#receipt-printing">receipt printing</a></li>
-<li><a href="#tokenisation">Tokenisation</a></li>
-<li><a href="#settlement">Settlement</a></li>
-<li><a href="#cash-out">Cash out</a></li>
+<li><a href="#getting-started-design-your-integration-dynamic-surcharge">Dynamic Surcharge</a></li>
+<li><a href="#getting-started-design-your-integration-tipping">Tipping</a></li>
+<li>Payments <a href="#getting-started-design-your-integration-user-interface">user interface</a> for all displays and inputs</li>
+<li>Sale System <a href="#getting-started-design-your-integration-receipt-printing">receipt printing</a></li>
+<li><a href="#getting-started-design-your-integration-tokenisation">Tokenisation</a></li>
+<li><a href="#getting-started-design-your-integration-settlement">Settlement</a></li>
+<li><a href="#getting-started-design-your-integration-cash-out">Cash out</a></li>
 </ul>
 
 <aside class="success">
@@ -974,7 +983,7 @@ For help on scoping your development work, or to discuss integration requirement
 <ol>
 <li>Merchant launches the Sale System</li>
 <li>Sale System opens the websocket connection</li>
-<li>Sale System has the option to <a href="#terminal-linking">link</a> with a POI Terminal by performing a <a href="#login">login request</a> either: 
+<li>Sale System has the option to <a href="#terminal-linking">link</a> with a POI Terminal by performing a <a href="#cloud-api-reference-methods-login">login request</a> either: 
 
 <ol>
 <li>When the Sale System launches or</li>
@@ -982,38 +991,91 @@ For help on scoping your development work, or to discuss integration requirement
 </ol></li>
 <li>Sale System receives a successful login response</li>
 <li>Merchant initiates a payment</li>
-<li>Sale System sends a <a href="#payment">payment request</a></li>
-<li>Sale System handles <a href="#display">display requests</a>, <a href="#print">print requests</a>, and <a href="#input">input requests</a></li>
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a></li>
+<li>Sale System handles <a href="#cloud-api-reference-methods-display">display requests</a>, <a href="#cloud-api-reference-methods-print">print requests</a>, and <a href="#cloud-api-reference-methods-input">input requests</a></li>
 <li>Sale System receives a payment response</li>
 <li>Merchant closes the Sale System</li>
-<li>Sale System can optionally send a <a href="#logout">logout request</a></li>
+<li>Sale System can optionally send a <a href="#cloud-api-reference-methods-logout">logout request</a></li>
 <li>Sale System closes the websocket</li>
 </ol>
 
 <p><img src="images/payment-lifecycle-basic-a1b6433d.png" alt="" /></p>
 <h3 id='getting-started-design-your-integration-terminal-linking'>Terminal linking</h3>
-<p>The POS (Sale System) communicates with a POI terminal using both a <code>SaleID</code> and <code>KEK</code> (which identifies the Sale System) and <code>POIID</code> (which identifies the terminal).</p>
+<p>The POS (Sale System) communicates with a POI terminal using both a <a href="#data-dictionary-saleid">SaleID</a> and <a href="#data-dictionary-kek">KEK</a> (which identifies the Sale System) and <a href="#data-dictionary-poiid">POIID</a> (which identifies the terminal).</p>
 
-<p>Before a payment is processed, the Sale System must be &#39;linked&#39; to a POI terminal by sending a <a href="#login">login</a> request. </p>
+<p>Before a payment is processed, the Sale System must be &#39;linked&#39; to a POI terminal by sending a <a href="#cloud-api-reference-methods-login">login</a> request. </p>
 
 <p>It is possible for a Sale System to &#39;link&#39; with multiple POI terminals, and for each POI terminal to be &#39;linked&#39; to multiple Sale Systems. In this 
-instance the Sale System should record multiple <code>POIID</code> values and enable the operator to select the desired POI terminal as part of the payment flow.</p>
+instance the Sale System should record multiple <a href="#data-dictionary-poiid">POIID</a> values and enable the operator to select the desired POI terminal as part of the payment flow.</p>
 
 <aside class="success">
 The Sale System must store the <code>KEK</code> in a secure location. 
 </aside>
-<h3 id='getting-started-design-your-integration-settings-user-interface'>Settings user interface</h3>
-<p>The Sale System must provide a user interface which allows the configuration of a <code>SaleID</code>, <code>KEK</code>, and <code>POIID</code> for each lane. </p>
+<h3 id='getting-started-design-your-integration-sale-system-settings'>Sale System settings</h3>
+<p>The Sale System must support configuration of both static Sale System settings, and cashier configurable settings.</p>
+<h4 id='getting-started-design-your-integration-sale-system-settings-static-sale-system-settings'>Static Sale System settings</h4>
+<p>Static Sale System settings are provided by DataMesh and are linked to the build of the Sale System. i.e. they will be the same for all merchants using the Sale System build.</p>
 
-<p>If the Sale System is to support many-to-one configuration (i.e. one Sale System linked to many POI terminals) it should support the entry of <code>SaleID</code> and <code>KEK</code> to identify the  Sale System lane, and a <code>POIID</code> for each POI terminal linked.</p>
+<p>These settings can be contained in a database or configuration file editable by a Sale System engineer, or hard coded into the Sale System build. </p>
+
+<p>Regardless of where they are stored, the Sale System must ensure the cashier or merchant is never required to configure the static settings, as they will not be aware of the required values. </p>
+
+<p>DataMesh will provide two sets of static settings; one set for the test environment, and one set for production. It is the responsibility of the Sale System to ensure the correct values 
+are included in a test or production build. </p>
+
+<p>The static Sale System settings are</p>
+
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Requ.</th>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#data-dictionary-provideridentification">ProviderIdentification</a></td>
+<td>✔</td>
+<td>String</td>
+<td>The name of the company supplying the Sale System. Provided by DataMesh. Sent in the login request.</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-applicationname">ApplicationName</a></td>
+<td>✔</td>
+<td>String</td>
+<td>The name of the Sale System application. Provided by DataMesh. Sent in the login request.</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-softwareversion">SoftwareVersion</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Must indicate the software version of the current Sale System build. Sent in the login request.</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-certificationcode">CertificationCode</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Certification code for this Sale System. Provided by DataMesh. Sent in the login request.</td>
+</tr>
+</tbody></table>
+<h4 id='getting-started-design-your-integration-sale-system-settings-cashier-configurable-settings'>Cashier configurable settings</h4>
+<p>The <a href="#data-dictionary-saleid">SaleID</a>, <a href="#data-dictionary-kek">KEK</a>, and <a href="#data-dictionary-poiid">POIID</a> are cashier configurable settings which may be different for each lane.</p>
+
+<p>The Sale System must ensure there is a user interface accessible by the cashier which enables these settings to be configured.</p>
+
+<p>The <a href="#data-dictionary-saleid">SaleID</a> and <a href="#data-dictionary-poiid">POIID</a> should be visible to the cashier. The <a href="#data-dictionary-kek">KEK</a> should be masked after entry by the cashier. </p>
+
+<p>If the Sale System is to support many-to-one configuration (i.e. one Sale System linked to many POI terminals) it should support the entry of <a href="#data-dictionary-saleid">SaleID</a> and <a href="#data-dictionary-kek">KEK</a> to identify the  Sale System lane, and a <a href="#data-dictionary-poiid">POIID</a> for each POI terminal linked.</p>
 
 <aside class="success">
 A "pairing" API request will be available in a future API release which will enable the delivery of <code>SaleID</code>, <code>POIID</code>, and <code>KEK</code> to the Sale System in place of the manual entry of these data fields. 
 </aside>
-<h4 id='getting-started-design-your-integration-settings-user-interface-example'>Example</h4>
-<p><img src="images/settings-ui-67db3b71.png" alt="" /></p>
+
+<p><em>Example setting UI</em></p>
+
+<p><img src="images/settings-ui-bf29005d.png" alt="" /></p>
 <h3 id='getting-started-design-your-integration-payment-types'>Payment types</h3>
-<p>Supported <a href="#payment">payment</a> types are:</p>
+<p>Supported <a href="#cloud-api-reference-methods-payment">payment</a> types are:</p>
 
 <ul>
 <li>Purchase</li>
@@ -1051,7 +1113,7 @@ Whilst the <a href="#data-dictionary-saletransactionid">SaleTransactionID</a> in
 
 <p>Some terminals have a built-in printer which can handle receipt printing. However, in order to support terminals without a built-in printer and improve the customer experience the Sale System should also handle printing receipts produced by the POI Terminal.</p>
 
-<p>To enable printing receipts from the Sale System, include &quot;PrinterReceipt&quot; in the list of available <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> when sending the <a href="#login">LoginRequest</a>. </p>
+<p>To enable printing receipts from the Sale System, include &quot;PrinterReceipt&quot; in the list of available <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> when sending the <a href="#cloud-api-reference-methods-login">LoginRequest</a>. </p>
 
 <aside class="success">
 The Sale System must print the receipt as formatted by DataMesh and not create a custom formatted receipt.
@@ -1102,13 +1164,13 @@ The <code>Input UI</code> elements are not currently available, and will be supp
 
 </aside>
 
-<p>If capable, the Sale System should present UI to the cashier for the duration of a payment. The content of the UI is set by the <a href="#input">input</a> and <a href="#display">display</a> request messages sent from the POI System.</p>
+<p>If capable, the Sale System should present UI to the cashier for the duration of a payment. The content of the UI is set by the <a href="#cloud-api-reference-methods-input">input</a> and <a href="#cloud-api-reference-methods-display">display</a> request messages sent from the POI System.</p>
 
 <p>In the examples presented below the UI is contained in a modal shadow box. This is an example to help illustrate how this UI may be implemented. The Sale System should implement this UI in a way that fits the look and feel of the rest of the system.</p>
 
 <p>The Sale System must not block communication with the POI System when displaying the payments UI. The POI System may send a display or input request, followed by another display or input request, or the payment response. For example, the POI System may send a &quot;SELECT ACCOUNT&quot; display, followed by a &quot;PROCESSING&quot; display when the card holder selects their account on the POI terminal. The POI System may send a &quot;SIGNATURE APPROVED&quot; input request, followed by a &quot;TIMEOUT&quot; display and payment response, if the cashier doesn&#39;t approve the signature in time.</p>
 
-<p>To enable display and input handling on the Sale System, <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> in the <a href="#login">login</a> request contains &quot;CashierStatus&quot;, &quot;CashierError&quot;, &quot;CashierInput&quot;, and &quot;CustomerAssistance&quot;.</p>
+<p>To enable display and input handling on the Sale System, <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> in the <a href="#cloud-api-reference-methods-login">login</a> request contains &quot;CashierStatus&quot;, &quot;CashierError&quot;, &quot;CashierInput&quot;, and &quot;CustomerAssistance&quot;.</p>
 
 <aside class="success">
 The DataMesh Nexo API is event based. The Sale System sends a payment request, handles events as they are received, and eventually receives a payment response.
@@ -1116,7 +1178,7 @@ The DataMesh Nexo API is event based. The Sale System sends a payment request, h
 <h4 id='getting-started-design-your-integration-payment-user-interface-cancelling-a-sale-in-progress'>Cancelling a sale in progress</h4>
 <p>Whilst a payment is in progress the Sale System should present UI to the cashier which enables them to request a cancellation of the payment. </p>
 
-<p>If the cashier initiates a payment cancellation, the Sale System sends an <a href="#abort-transaction">abort transaction request</a> and continues to wait for the payment response. </p>
+<p>If the cashier initiates a payment cancellation, the Sale System sends an <a href="#cloud-api-reference-methods-abort-transaction">abort transaction request</a> and continues to wait for the payment response. </p>
 
 <p>The Sale System may allow the cashier to continue to request cancellation of the payment until a payment result has been received.</p>
 
@@ -1124,7 +1186,7 @@ The DataMesh Nexo API is event based. The Sale System sends a payment request, h
 There are a number of instances where the Terminal may be unable to cancel a payment in progress upon receiving a <a href="#abort-transaction">abort transaction request</a>. The Sale System must <b>always</b> await a payment response after sending an abort transaction request. 
 </aside>
 <h4 id='getting-started-design-your-integration-payment-user-interface-initial-ui'>Initial UI</h4>
-<p>The Sale System should immediately display an initial UI after sending a <a href="#payment">payment</a> request which informs the cashier the payment is in progress. This UI is required to handle instances where the first display/input message from the POI System is not present, or delayed.</p>
+<p>The Sale System should immediately display an initial UI after sending a <a href="#cloud-api-reference-methods-payment">payment</a> request which informs the cashier the payment is in progress. This UI is required to handle instances where the first display/input message from the POI System is not present, or delayed.</p>
 
 <p>This UI should also enable the cashier to request a cancellation of the transaction.</p>
 
@@ -1147,25 +1209,23 @@ There are a number of instances where the Terminal may be unable to cancel a pay
          </span><span class="nl">"POIID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"DisplayRequest"</span><span class="p">:{</span><span class="w">
-         </span><span class="nl">"DisplayOutput"</span><span class="p">:[</span><span class="w">
-            </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"ResponseRequiredFlag"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"Device"</span><span class="p">:</span><span class="s2">"CashierDisplay"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"InfoQualify"</span><span class="p">:</span><span class="s2">"Status"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"OutputContent"</span><span class="p">:{</span><span class="w">
-                  </span><span class="nl">"OutputFormat"</span><span class="p">:</span><span class="s2">"Text"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"OutputText"</span><span class="p">:{</span><span class="w">
-                     </span><span class="nl">"Text"</span><span class="p">:</span><span class="s2">"LINE OF TEXT MAX 40 CHARACTERS"</span><span class="w">
-                  </span><span class="p">}</span><span class="w">
+         </span><span class="nl">"DisplayOutput"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"ResponseRequiredFlag"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Device"</span><span class="p">:</span><span class="s2">"CashierDisplay"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"InfoQualify"</span><span class="p">:</span><span class="s2">"Status"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"OutputContent"</span><span class="p">:{</span><span class="w">
+               </span><span class="nl">"OutputFormat"</span><span class="p">:</span><span class="s2">"Text"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"OutputText"</span><span class="p">:{</span><span class="w">
+                  </span><span class="nl">"Text"</span><span class="p">:</span><span class="s2">"LINE OF TEXT MAX 40 CHARACTERS"</span><span class="w">
                </span><span class="p">}</span><span class="w">
-            </span><span class="p">}</span><span class="w">           
-         </span><span class="p">]</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+         </span><span class="p">}</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"SecurityTrailer"</span><span class="p">:{</span><span class="err">...</span><span class="p">}</span><span class="w">
    </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>The POI system will send zero or more <a href="#display">display request</a> messages to the Sale System during a transaction. The Sale System should display these messages and continue to wait for the payment response.</p>
+<p>The POI system will send zero or more <a href="#cloud-api-reference-methods-display">display request</a> messages to the Sale System during a transaction. The Sale System should display these messages and continue to wait for the payment response.</p>
 
 <ul>
 <li>Each display request will contain at least 1 line of text.</li>
@@ -1184,7 +1244,7 @@ There are a number of instances where the Terminal may be unable to cancel a pay
 The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
 </aside>
 
-<p>The POI system will send zero or more <a href="#input">input request</a> messages to the Sale System during a transaction. The Sale System should display these input requests, allow the cashier the option to answer the input request, and continue to wait for the payment response. The Sale System should not block on an input request, as the POI System may continue with the transaction before the Sale System has sent an input response.</p>
+<p>The POI system will send zero or more <a href="#cloud-api-reference-methods-input">input request</a> messages to the Sale System during a transaction. The Sale System should display these input requests, allow the cashier the option to answer the input request, and continue to wait for the payment response. The Sale System should not block on an input request, as the POI System may continue with the transaction before the Sale System has sent an input response.</p>
 
 <ul>
 <li>There are six types of input request. The <a href="#data-dictionary-inputcommand">InputCommand</a> indicates which input request type the Sale System should present:
@@ -1363,7 +1423,7 @@ Including all available product information in each payment request will improve
 <h3 id='getting-started-design-your-integration-settlement'>Settlement</h3>
 <p>The Sale System can reconcile with the POI System periodically but should normally be once a day as it affects settlements with acquirers.</p>
 
-<p>Use the <a href="#reconciliation">Reconciliation</a> request to initiate a settlement.</p>
+<p>Use the <a href="#cloud-api-reference-methods-reconciliation">Reconciliation</a> request to initiate a settlement.</p>
 <h3 id='getting-started-design-your-integration-tokenisation'>Tokenisation</h3>
 <p>Cards can be pre-tokenised by the Sale System if required. This supports mobile apps, eCommerce and Sale System type systems.</p>
 
@@ -1380,17 +1440,17 @@ Two types of token can be requested:
 - **Customer** - token which is scoped to the customer. For example, if the same card is tokenised on two different POI Terminals owned by the merchant, the same token will be returned. A `Customer` token can be used to represent the card holder and perform operations for a longer period.
 -->
 <h4 id='getting-started-design-your-integration-tokenisation-tokenise-a-card-used-for-a-payment'>Tokenise a card used for a payment</h4>
-<p>To tokenise a card as part of a <a href="#payment">payment</a>, set <a href="#data-dictionary-tokenrequestedtype">SaleData.TokenRequestedType</a> in the payment request to &quot;Transaction&quot; or &quot;Customer&quot;.</p>
+<p>To tokenise a card as part of a <a href="#cloud-api-reference-methods-payment">payment</a>, set <a href="#data-dictionary-tokenrequestedtype">SaleData.TokenRequestedType</a> in the payment request to &quot;Transaction&quot; or &quot;Customer&quot;.</p>
 
 <p>When <a href="#data-dictionary-tokenrequestedtype">SaleData.TokenRequestedType</a> is set, the token will be returned as part of the payment response in <a href="#data-dictionary-paymenttoken">PaymentResult.PaymentInstrumentData.CardData.PaymentToken</a>.</p>
 <h4 id='getting-started-design-your-integration-tokenisation-tokenise-a-card-without-payment'>Tokenise a card without payment</h4>
-<p>The <a href="#card-acquisition">card acquisition</a> request allows the Sale System to tokenise a card which can be used in future payment requests.</p>
+<p>The <a href="#cloud-api-reference-methods-card-acquisition">card acquisition</a> request allows the Sale System to tokenise a card which can be used in future payment requests.</p>
 
 <!-- TODO - need to validate how this works
 
 #### Use a token for a payment 
 
-To perform a [payment](#payment) request using a token: 
+To perform a [payment](#cloud-api-reference-methods-payment) request using a token: 
 
 - Populate [PaymentTransaction.OriginalPOITransaction](#data-dictionary-originalpoitransaction) with details of the sale used to acquire the token
 - Set [PaymentTransaction.OriginalPOITransaction.ReuseCardDataFlag](#reusecarddataflag) to true
@@ -1400,11 +1460,11 @@ To perform a [payment](#payment) request using a token:
 
 -->
 <h3 id='getting-started-design-your-integration-split-payments'>Split payments</h3>
-<p>To perform a split payment, the Sale System should send multiple <a href="#payment">payment</a> requests, one for each split. </p>
+<p>To perform a split payment, the Sale System should send multiple <a href="#cloud-api-reference-methods-payment">payment</a> requests, one for each split. </p>
 
 <p>Split is allowed when <a href="#data-dictionary-paymenttype">PaymentType</a> is &quot;Normal&quot;.</p>
 
-<p>The following data elements should be set by the Sale System for a split payment in a <a href="#payment">payment</a> request:</p>
+<p>The following data elements should be set by the Sale System for a split payment in a <a href="#cloud-api-reference-methods-payment">payment</a> request:</p>
 
 <ul>
 <li>All split payments which are part of the same sale should include the same <a href="#data-dictionary-saletransactionid">SaleData.SaleTransactionID</a>. </li>
@@ -1444,7 +1504,7 @@ To perform a [payment](#payment) request using a token:
 <li>Cashier prints a sale ticket for $100 and presents to the card holder</li>
 <li>Card holder signs and writes a tip of $10</li>
 <li>Cashier opens $100 sale on the Sale System, enters tip of $10 and initiates payment</li>
-<li>Sale System sends a <a href="#payment">payment request</a> request to the POI Terminal and sets
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a> request to the POI Terminal and sets
 
 <ul>
 <li><a href="#requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a> to $110 (sale amount + tip)</li>
@@ -1460,7 +1520,7 @@ To perform a [payment](#payment) request using a token:
 
 <ol>
 <li>Cashier opens $100 sale on the Sale System and initiates payment</li>
-<li>Sale System sends a <a href="#payment">payment request</a> request to the POI Terminal and sets
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a> request to the POI Terminal and sets
 
 <ul>
 <li><a href="#requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a> to $110 (sale amount + tip)</li>
@@ -1496,7 +1556,7 @@ The amount returned in <a href="#authorizedamount">AuthorizedAmount</a> in the p
 <ol>
 <li>Merchant enables dynamic surcharge on Unify for their terminal fleet and configures a 1.9% surcharge on Amex/Diners cards</li>
 <li>Cashier opens $100 sale on the Sale System and initiates payment</li>
-<li>Sale System sends a <a href="#payment">payment request</a> request to the POI Terminal and sets <a href="#requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a> to $100</li>
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a> request to the POI Terminal and sets <a href="#requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a> to $100</li>
 <li>Card holder presents their Amex card</li>
 <li>POI Terminal calcualtes new total based on the card type and processes a payment of $101.90 </li>
 <li>POI Terminal approves payment and returns the result to the Sale System with 
@@ -1560,7 +1620,7 @@ The amount returned in <a href="#authorizedamount">AuthorizedAmount</a> in the p
 </ul></li>
 <li>The Sale System must resolve the DNS address before each connection attempt, and never hard code IP addresses</li>
 <li>The Sale System should manage SSL certificate revocation lists and ensure OS security updates are applied</li>
-<li>The Sale System should store the <code>SaleID</code>, <code>POIID</code>, and <code>KEK</code> in a secure location. These values are used to identify the Sale System and authenticate the <a href="#securitytrailer">SecurityTrailer</a></li>
+<li>The Sale System should store the <a href="#data-dictionary-saleid">SaleID</a>, <a href="#data-dictionary-poiid">POIID</a>, and <a href="#data-dictionary-kek">KEK</a> in a secure location. These values are used to identify the Sale System and authenticate the <a href="#securitytrailer">SecurityTrailer</a></li>
 </ul>
 
 <!--  - Unify utilises one of the root CA's provided by [Sectigo](https://sectigo.com/resource-library/sectigo-root-intermediate-certificate-files) and [Digicert](https://www.digicert.com/kb/digicert-root-certificates.htm). The Sale System must ensure all certificate authorities from these sources are loaded into the certificate store used to validate the server. 
@@ -1697,13 +1757,13 @@ the Sale System must ignore when extra objects and fields are present in respons
 <td><a href="#data-dictionary-saleid">SaleID</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Uniquely identifies the Sale System. The <code>SaleID</code> is provided by DataMesh, and must match the SaleID configured in Unify.</td>
+<td>Uniquely identifies the Sale System. The <a href="#data-dictionary-saleid">SaleID</a> is provided by DataMesh, and must match the SaleID configured in Unify.</td>
 </tr>
 <tr>
 <td><a href="#data-dictionary-poiid">POIID</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Uniquely identifies the POI Terminal. The <code>POIID</code> is provided by DataMesh, and must match the POIID configured in Unify. For Sale Systems that do not need a POI Terminal, the value must be &quot;POI Server&quot;</td>
+<td>Uniquely identifies the POI Terminal. The <a href="#data-dictionary-poiid">POIID</a> is provided by DataMesh, and must match the POIID configured in Unify. For Sale Systems that do not need a POI Terminal, the value must be &quot;POI Server&quot;</td>
 </tr>
 </tbody></table>
 <h3 id='cloud-api-reference-message-format-payload'>Payload</h3>
@@ -1745,7 +1805,7 @@ the Sale System must ignore when extra objects and fields are present in respons
 </span></code></pre></div>
 <p>A <code>SecurityTrailer</code> object is included with each request and response. </p>
 
-<p>Unify authenticates requests from the Sale System by examining the <code>SecurityTrailer</code>, along with the <code>SaleID</code>, <code>POIID</code>, and <code>CertificationCode</code></p>
+<p>Unify authenticates requests from the Sale System by examining the <code>SecurityTrailer</code>, along with the <a href="#data-dictionary-saleid">SaleID</a>, <a href="#data-dictionary-poiid">POIID</a>, and <code>CertificationCode</code></p>
 
 <p>Session Keys are used to generate/verify a Message Authentication Code (MAC) to prove the authenticity of transactions. They are also used to protect Sensitive Card Data if sent from the Sale System. Session keys must change for every message.</p>
 
@@ -1867,10 +1927,10 @@ the Sale System must ignore when extra objects and fields are present in respons
 For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 </aside>
 <h2 id='cloud-api-reference-perform-a-purchase'>Perform a purchase</h2>
-<p>To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the <a href="#payment-lifecycle">payment lifecycle</a>.</p>
+<p>To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the <a href="#getting-started-design-your-integration-payment-lifecycle">payment lifecycle</a>.</p>
 
 <ul>
-<li>If a login hasn&#39;t already been sent for the session, send a login request as detailed in <a href="#login">login request</a> 
+<li>If a login hasn&#39;t already been sent for the session, send a login request as detailed in <a href="#cloud-api-reference-methods-login">login request</a> 
 
 <ul>
 <li>Ensure &quot;PrinterReceipt&quot; is included in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> if payment receipts are to be redirected to the Sale System</li>
@@ -1881,7 +1941,7 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 <li>Ensure the <a href="#data-dictionary-serviceid">ServiceID</a> in the result matches the request</li>
 <li>Record the <a href="#data-dictionary-poiserialnumber">POISerialNumber</a> to be sent in subsequent login requests</li>
 </ul></li>
-<li>Send a payment request, including all required fields, as detailed in <a href="#payment">payment request</a> 
+<li>Send a payment request, including all required fields, as detailed in <a href="#cloud-api-reference-methods-payment">payment request</a> 
 
 <ul>
 <li>Set <a href="#data-dictionary-paymenttype">PaymentData.PaymentType</a> to &quot;Normal&quot;</li>
@@ -1889,7 +1949,7 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 <li>Set <a href="#data-dictionary-saletransactionid">SaleTransactionID</a> to a unique value for the sale on this Sale System</li>
 <li>Populate the <a href="#data-dictionary-saleitem">SaleItem</a> array with the product basket for the transaction </li>
 </ul></li>
-<li>If configured in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a>, handle any <a href="#display">display</a>, <a href="#print">print</a>, and <a href="#input">input</a> events the POI System sends
+<li>If configured in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a>, handle any <a href="#cloud-api-reference-methods-display">display</a>, <a href="#cloud-api-reference-methods-print">print</a>, and <a href="#cloud-api-reference-methods-input">input</a> events the POI System sends
 
 <ul>
 <li>The expected user interface handling is outlined in <a href="#user-interface">user interface</a></li>
@@ -1900,26 +1960,22 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 <ul>
 <li>Ensure the <a href="#data-dictionary-serviceid">ServiceID</a> in the result matches the request</li>
 <li>Check <a href="#data-dictionary-result">Response.Result</a> for the transaction result </li>
-<li>If <a href="#data-dictionary-result">Response.Result</a> is &quot;Success&quot;, record the following to enable future matched refunds:</li>
-<li><a href="#data-dictionary-saleid">SaleID</a></li>
-<li><a href="#data-dictionary-poiid">POIID</a></li>
-<li><a href="#data-dictionary-poitransactionid">POITransactionID</a></li>
+<li>If <a href="#data-dictionary-result">Response.Result</a> is &quot;Success&quot;, record the following to enable future matched refunds: <a href="#data-dictionary-saleid">SaleID</a>, <a href="#data-dictionary-poiid">POIID</a>, and <a href="#data-dictionary-poitransactionid">POITransactionID</a></li>
 <li>Check <a href="#authorizedamount">PaymentResult.AmountsResp.AuthorizedAmount</a> (it may not equal the <code>RequestedAmount</code> in the payment request)</li>
 <li>If the Sale System is handling tipping or surcharge, check the <a href="#tipamount">PaymentResult.AmountsResp.TipAmount</a>, and <a href="#surchargeamount">PaymentResult.AmountsResp.SurchargeAmount</a></li>
 <li>Print the receipt contained in <code>PaymentReceipt</code></li>
 </ul></li>
-<li>Implement error handling outlined in <a href="#error-handling">error handling</a></li>
+<li>Implement error handling outlined in <a href="#cloud-api-reference-error-handling">error handling</a></li>
 </ul>
 <h2 id='cloud-api-reference-perform-a-refund'>Perform a refund</h2>
 <!-- TODO need to add support here for matched refunds -->
 
-<p>To perform a refund the Sale System will need to implement requests, and handle responses outlined in the <a href="#payment-lifecycle">payment lifecycle</a>.</p>
+<p>To perform a refund the Sale System will need to implement requests, and handle responses outlined in the <a href="#getting-started-design-your-integration-payment-lifecycle">payment lifecycle</a>.</p>
 
-<p>In most cases the Sale System should attempt to 
-//</p>
+<p>If refunding a previous purchase, the Sale System should include details of the original purchase. </p>
 
 <ul>
-<li>If a login hasn&#39;t already been sent for the session, send a login request as detailed in <a href="#login">login request</a> 
+<li>If a login hasn&#39;t already been sent for the session, send a login request as detailed in <a href="#cloud-api-reference-methods-login">login request</a> 
 
 <ul>
 <li>Ensure &quot;PrinterReceipt&quot; is included in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a> if payment receipts are to be redirected to the Sale System</li>
@@ -1930,19 +1986,19 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 <li>Ensure the <a href="#data-dictionary-serviceid">ServiceID</a> in the result matches the request</li>
 <li>Record the <a href="#data-dictionary-poiserialnumber">POISerialNumber</a> to be sent in subsequent login requests</li>
 </ul></li>
-<li>Send a payment request, including all required fields, as detailed in <a href="#payment">payment request</a> 
+<li>Send a payment request, including all required fields, as detailed in <a href="#cloud-api-reference-methods-payment">payment request</a> 
 
 <ul>
 <li>Set <a href="#data-dictionary-paymenttype">PaymentData.PaymentType</a> to &quot;Refund&quot;</li>
 <li>Set the refund amount in <a href="#requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a></li>
 <li>Set <a href="#data-dictionary-saletransactionid">SaleTransactionID</a> to a unique value for the sale on this Sale System</li>
 <li>If refunding a previous purchase, set the following fields in <a href="#data-dictionary-originalpoitransaction">PaymentTransaction.OriginalPOITransaction</a></li>
-<li>Set <a href="#data-dictionary-saleid">SaleID</a> to the <code>SaleId</code> of the original purchase payment request </li>
-<li>Set <a href="#data-dictionary-poiid">POIID</a> to the <code>POIID</code> of the original purchase payment request </li>
+<li>Set <a href="#data-dictionary-saleid">SaleID</a> to the <a href="#data-dictionary-saleid">SaleID</a> of the original purchase payment request </li>
+<li>Set <a href="#data-dictionary-poiid">POIID</a> to the <a href="#data-dictionary-poiid">POIID</a> of the original purchase payment request </li>
 <li>Set <a href="#data-dictionary-poitransactionid">POITransactionID</a> to the value returned in <a href="#data-dictionary-poitransactionid">POIData.POITransactionID</a> of the original purchase payment response </li>
 <li>The product basket is not required for refunds</li>
 </ul></li>
-<li>If configured in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a>, handle any <a href="#display">display</a>, <a href="#print">print</a>, and <a href="#input">input</a> events the POI System sends
+<li>If configured in <a href="#data-dictionary-salecapabilities">SaleTerminalData.SaleCapabilities</a>, handle any <a href="#cloud-api-reference-methods-display">display</a>, <a href="#cloud-api-reference-methods-print">print</a>, and <a href="#cloud-api-reference-methods-input">input</a> events the POI System sends
 
 <ul>
 <li>The expected user interface handling is outlined in <a href="#user-interface">user interface</a></li>
@@ -1956,7 +2012,7 @@ For brevity the <code>SecurityTrailer</code> has been excluded from examples.
 <li>Check <a href="#authorizedamount">PaymentResult.AmountsResp.AuthorizedAmount</a> (it may not equal the <code>RequestedAmount</code> in the payment request)</li>
 <li>Print the receipt contained in <code>PaymentReceipt</code></li>
 </ul></li>
-<li>Implement error handling outlined in <a href="#error-handling">error handling</a></li>
+<li>Implement error handling outlined in <a href="#cloud-api-reference-error-handling">error handling</a></li>
 </ul>
 <h2 id='cloud-api-reference-methods'>Methods</h2><h3 id='cloud-api-reference-methods-login'>Login</h3>
 <p>The Sale System sends a NEXO Login request when it is ready to pair with a POI terminal and 
@@ -2083,25 +2139,25 @@ sending another NEXO Login request.</p>
 <td> <a href="#data-dictionary-provideridentification">ProviderIdentification</a></td>
 <td>✔</td>
 <td>String</td>
-<td>The name of the company supplying the Sale System</td>
+<td>The name of the company supplying the Sale System. Provided by DataMesh.</td>
 </tr>
 <tr>
 <td> <a href="#data-dictionary-applicationname">ApplicationName</a></td>
 <td>✔</td>
 <td>String</td>
-<td>The name of the Sale System application</td>
+<td>The name of the Sale System application. Provided by DataMesh.</td>
 </tr>
 <tr>
 <td> <a href="#data-dictionary-softwareversion">SoftwareVersion</a></td>
 <td>✔</td>
 <td>String</td>
-<td>The software version of the Sale System</td>
+<td>The software version of the Sale System. Must be the software version of the current build.</td>
 </tr>
 <tr>
 <td> <a href="#data-dictionary-certificationcode">CertificationCode</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Certification code for this Sale System provided by DataMesh</td>
+<td>Certification code for this Sale System. Provided by DataMesh.</td>
 </tr>
 <tr>
 <td><strong>SaleTerminalData</strong></td>
@@ -2129,7 +2185,7 @@ sending another NEXO Login request.</p>
 </tr>
 <tr>
 <td><a href="#operatorlanguage">OperatorLanguage</a></td>
-<td>✔</td>
+<td></td>
 <td>String</td>
 <td>Operator language. Set to &#39;en&#39;</td>
 </tr>
@@ -2817,7 +2873,7 @@ will be rejected by the POI System until the next Login.</p>
 </tr>
 <tr>
 <td> <a href="#operatorlanguage">OperatorLanguage</a></td>
-<td>✔</td>
+<td></td>
 <td>String</td>
 <td>Set to &quot;en&quot;</td>
 </tr>
@@ -2945,13 +3001,13 @@ will be rejected by the POI System until the next Login.</p>
 <td>  <a href="#data-dictionary-saleid">SaleID</a></td>
 <td>✔</td>
 <td>String</td>
-<td><code>SaleID</code> which performed the original transaction</td>
+<td><a href="#data-dictionary-saleid">SaleID</a> which performed the original transaction</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-poiid">POIID</a></td>
 <td>✔</td>
 <td>String</td>
-<td><code>POIID</code> which performed the original transaction</td>
+<td><a href="#data-dictionary-poiid">POIID</a> which performed the original transaction</td>
 </tr>
 <tr>
 <td>  <strong>POITransactionID</strong></td>
@@ -3700,19 +3756,17 @@ will be rejected by the POI System until the next Login.</p>
          </span><span class="nl">"POIID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"DisplayRequest"</span><span class="p">:{</span><span class="w">
-         </span><span class="nl">"DisplayOutput"</span><span class="p">:[</span><span class="w">
-            </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"ResponseRequiredFlag"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"Device"</span><span class="p">:</span><span class="s2">"CashierDisplay"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"InfoQualify"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"OutputContent"</span><span class="p">:{</span><span class="w">
-                  </span><span class="nl">"OutputFormat"</span><span class="p">:</span><span class="s2">"Text"</span><span class="p">,</span><span class="w">
-                  </span><span class="nl">"OutputText"</span><span class="p">:{</span><span class="w">
-                     </span><span class="nl">"Text"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
-                  </span><span class="p">}</span><span class="w">
+         </span><span class="nl">"DisplayOutput"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"ResponseRequiredFlag"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Device"</span><span class="p">:</span><span class="s2">"CashierDisplay"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"InfoQualify"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"OutputContent"</span><span class="p">:{</span><span class="w">
+               </span><span class="nl">"OutputFormat"</span><span class="p">:</span><span class="s2">"Text"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"OutputText"</span><span class="p">:{</span><span class="w">
+                  </span><span class="nl">"Text"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
                </span><span class="p">}</span><span class="w">
             </span><span class="p">}</span><span class="w">
-         </span><span class="p">]</span><span class="w">
+         </span><span class="p">}</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"SecurityTrailer"</span><span class="p">:{</span><span class="err">...</span><span class="p">}</span><span class="w">
    </span><span class="p">}</span><span class="w">
@@ -3779,8 +3833,8 @@ will be rejected by the POI System until the next Login.</p>
 <tr>
 <td><strong>DisplayOutput</strong></td>
 <td>✔</td>
-<td>Array</td>
-<td>Array [1..6] of objects which represents the display</td>
+<td>Object</td>
+<td>Object which represents the display</td>
 </tr>
 <tr>
 <td> <a href="#data-dictionary-responserequiredflag">ResponseRequiredFlag</a></td>
@@ -3908,8 +3962,8 @@ will be rejected by the POI System until the next Login.</p>
 <tr>
 <td><em>OutputResult</em></td>
 <td>✔</td>
-<td>Array</td>
-<td>Array [1..6]. One object per Device/InfoQualify pair of values where corresponding <code>ResponseRequiredFlag</code> in the <code>DisplayRequest</code> is set to true.</td>
+<td>Object</td>
+<td>Response for Device/InfoQualify pair where corresponding <code>ResponseRequiredFlag</code> in the <code>DisplayRequest</code> is set to true.</td>
 </tr>
 <tr>
 <td> <a href="#device">Device</a></td>
@@ -3943,6 +3997,10 @@ will be rejected by the POI System until the next Login.</p>
 </tr>
 </tbody></table>
 <h3 id='cloud-api-reference-methods-input'>Input</h3>
+<aside class="warning">
+The <code>Input UI</code> elements are not currently available, and will be supported by a future Unify release. Support for these elements by the Sale System is optional.
+</aside>
+
 <p>During a payment, the POI System will input requests to the Sale System if cashier interaction is required (e.g. signature approved yes/no)</p>
 
 <p>Follow the <a href="#user-interface">user interface</a> guide for details on how to implement the required UI to handle display and input requests.</p>
@@ -5279,7 +5337,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 </tr>
 <tr>
 <td><a href="#data-dictionary-poireconciliationid">POIReconciliationID</a></td>
-<td>✔</td>
+<td></td>
 <td>String</td>
 <td>Present if ReconciliationType is &quot;PreviousReconciliation&quot;. See <a href="#data-dictionary-poireconciliationid">POIReconciliationID</a></td>
 </tr>
@@ -5907,7 +5965,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 
 <ol>
 <li>Cashier initiates a payment</li>
-<li>Sale System sends a <a href="#payment">payment request</a></li>
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a></li>
 <li>Network error or timeout occurs</li>
 <li>Sale System awaits Internet availability</li>
 <li>Sale System enters a loop for a maximum of 90 seconds</li>
@@ -5934,7 +5992,7 @@ If the Sale System is unable retrieve a result within 90 seconds the payment has
 <ol>
 <li>Cashier initiates a payment</li>
 <li>Sale System sets txn_in_progress flag</li>
-<li>Sale System sends a <a href="#payment">payment request</a></li>
+<li>Sale System sends a <a href="#cloud-api-reference-methods-payment">payment request</a></li>
 <li>Sale System power failure occurs</li>
 <li>Sale System start up after power failure</li>
 <li>Sale System checks if txn_in_progress flag is set. If so, enter error handling</li>
@@ -6141,20 +6199,20 @@ the Sale System must ignore when extra objects and fields are present in respons
 <!-- 
 ## Perform a purchase
 
-To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a purchase the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Normal"
   - Set the purchase amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - Populate the [SaleItem](#data-dictionary-saleitem) array with the product basket for the transaction 
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
@@ -6167,31 +6225,31 @@ To perform a purchase the Sale System will need to implement requests, and handl
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - If the Sale System is handling tipping or surcharge, check the [PaymentResult.AmountsResp.TipAmount](#tipamount), and [PaymentResult.AmountsResp.SurchargeAmount](#surchargeamount)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 
 ## Perform a refund
 
-To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#payment-lifecycle).
+To perform a refund the Sale System will need to implement requests, and handle responses outlined in the [payment lifecycle](#getting-started-design-your-integration-payment-lifecycle).
 
 In most cases the Sale System should attempt to 
 //
 
-- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#login) 
+- If a login hasn't already been sent for the session, send a login request as detailed in [login request](#cloud-api-reference-methods-login) 
   - Ensure "PrinterReceipt" is included in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities) if payment receipts are to be redirected to the Sale System
 - Await the a login response and
   - Ensure the [ServiceID](#data-dictionary-serviceid) in the result matches the request
   - Record the [POISerialNumber](#data-dictionary-poiserialnumber) to be sent in subsequent login requests
-- Send a payment request, including all required fields, as detailed in [payment request](#payment) 
+- Send a payment request, including all required fields, as detailed in [payment request](#cloud-api-reference-methods-payment) 
   - Set [PaymentData.PaymentType](#data-dictionary-paymenttype) to "Refund"
   - Set the refund amount in [PaymentTransaction.AmountsReq.RequestedAmount](#requestedamount)
   - Set [SaleTransactionID](#data-dictionary-saletransactionid) to a unique value for the sale on this Sale System
   - If refunding a previous purchase, set the following fields in [PaymentTransaction.OriginalPOITransaction](#data-dictionary-originalpoitransaction)
-    - Set [SaleID](#data-dictionary-saleid) to the `SaleId` of the original purchase payment request 
-    - Set [POIID](#data-dictionary-poiid) to the `POIID` of the original purchase payment request 
+    - Set [SaleID](#data-dictionary-saleid) to the [SaleID](#data-dictionary-saleid) of the original purchase payment request 
+    - Set [POIID](#data-dictionary-poiid) to the [POIID](#data-dictionary-poiid) of the original purchase payment request 
     - Set [POITransactionID](#data-dictionary-poitransactionid) to the value returned in [POIData.POITransactionID](#data-dictionary-poitransactionid) of the original purchase payment response 
     - The product basket is not required for refunds
-- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#display), [print](#print), and [input](#input) events the POI System sends
+- If configured in [SaleTerminalData.SaleCapabilities](#data-dictionary-salecapabilities), handle any [display](#cloud-api-reference-methods-display), [print](#cloud-api-reference-methods-print), and [input](#cloud-api-reference-methods-input) events the POI System sends
   - The expected user interface handling is outlined in [user interface](#user-interface)
   - The expected payment receipt handling is outlined in [receipt printing](#receipt-printing)
 - Await the payment response 
@@ -6199,7 +6257,7 @@ In most cases the Sale System should attempt to
   - Check [Response.Result](#data-dictionary-result) for the transaction result 
   - Check [PaymentResult.AmountsResp.AuthorizedAmount](#authorizedamount) (it may not equal the `RequestedAmount` in the payment request)
   - Print the receipt contained in `PaymentReceipt`
-- Implement error handling outlined in [error handling](#error-handling)
+- Implement error handling outlined in [error handling](#cloud-api-reference-error-handling)
 
 -->
 <h2 id='satellite-api-reference-methods'>Methods</h2><h3 id='satellite-api-reference-methods-payment'>Payment</h3>
@@ -6414,7 +6472,7 @@ In most cases the Sale System should attempt to
 </tr>
 <tr>
 <td> <a href="#operatorlanguage">OperatorLanguage</a></td>
-<td>✔</td>
+<td></td>
 <td>String</td>
 <td>Set to &quot;en&quot;</td>
 </tr>
@@ -6542,13 +6600,13 @@ In most cases the Sale System should attempt to
 <td>  <a href="#data-dictionary-saleid">SaleID</a></td>
 <td>✔</td>
 <td>String</td>
-<td><code>SaleID</code> which performed the original transaction</td>
+<td><a href="#data-dictionary-saleid">SaleID</a> which performed the original transaction</td>
 </tr>
 <tr>
 <td>  <a href="#data-dictionary-poiid">POIID</a></td>
 <td>✔</td>
 <td>String</td>
-<td><code>POIID</code> which performed the original transaction</td>
+<td><a href="#data-dictionary-poiid">POIID</a> which performed the original transaction</td>
 </tr>
 <tr>
 <td>  <strong>POITransactionID</strong></td>
@@ -7414,7 +7472,9 @@ Sale System should allow for a "catch all" which handles currently undefined err
 <li>&quot;Card&quot;</li>
 </ul>
 <h2 id='data-dictionary-applicationname'>ApplicationName</h2>
-<p>The name of the Sale System application</p>
+<p>The name of the Sale System application.</p>
+
+<p>DataMesh will provide a <code>ApplicationName</code> to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a <code>ApplicationName</code> to be included in the production build of the Sale System. </p>
 <h2 id='data-dictionary-cardbrand'>CardBrand</h2>
 <p>Available values:</p>
 
@@ -7457,7 +7517,9 @@ Sale System should allow for a "catch all" which handles currently undefined err
 </tr>
 </tbody></table>
 <h2 id='data-dictionary-certificationcode'>CertificationCode</h2>
-<p>Certification code for this Sale System provided by Data Mesh</p>
+<p>Certification code for this Sale System.</p>
+
+<p>DataMesh will provide a <code>CertificationCode</code> to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a <code>CertificationCode</code> to be included in the production build of the Sale System. </p>
 <h2 id='data-dictionary-datetime'>DateTime</h2>
 <p>Current Sale System time, formatted as <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a> DateTime. This will be included in receipts. e.g. &quot;2019-09-02T09:13:51.0+01:00&quot; </p>
 <h2 id='data-dictionary-eanupc'>EanUpc</h2>
@@ -7839,9 +7901,9 @@ For all input types, the card holder input may also be provided on the POI termi
 <li>Notification</li>
 </ul>
 <h2 id='data-dictionary-operatorid'>OperatorId</h2>
-<p>An optional value sent in the <a href="#login">Login Request</a> for information only. Used to identify the cashier using the Sale Terminal during the session.</p>
+<p>An optional value sent in the <a href="#cloud-api-reference-methods-login">Login Request</a> for information only. Used to identify the cashier using the Sale Terminal during the session.</p>
 
-<p>If present, totals in the <a href="#reconciliation">ReconciliationResponse</a> will be grouped by this value. If not present, payment transactions that do not specify a <code>OperatorId</code> will not be grouped under a <code>OperatorId</code>.</p>
+<p>If present, totals in the <a href="#cloud-api-reference-methods-reconciliation">ReconciliationResponse</a> will be grouped by this value. If not present, payment transactions that do not specify a <code>OperatorId</code> will not be grouped under a <code>OperatorId</code>.</p>
 
 <p>Note that different cashiers may still transact during the same login session by setting an <code>OperatorId</code> per payment. </p>
 <h2 id='data-dictionary-originalpoitransaction'>OriginalPOITransaction</h2>
@@ -7875,7 +7937,13 @@ For all input types, the card holder input may also be provided on the POI termi
 "560192"             | Westpac
 -->
 <h2 id='data-dictionary-paymentbrand'>PaymentBrand</h2>
-<p>Identifies the payment brand used for a payment. Available values:</p>
+<p>Identifies the payment brand used for a payment. </p>
+
+<aside class="notice">
+Please note that this list may expand in the future as new payment types are added. 
+</aside>
+
+<p>Available values:</p>
 
 <ul>
 <li>&quot;VISA&quot;</li>
@@ -7889,7 +7957,7 @@ For all input types, the card holder input may also be provided on the POI termi
 <li>&quot;Debit&quot;</li>
 <li>&quot;AliPay&quot;</li>
 <li>&quot;WeChat Pay&quot;</li>
-<li>&quot;Other&quot;</li>
+<li>&quot;Card&quot;</li>
 </ul>
 <h2 id='data-dictionary-paymentcurrency'>PaymentCurrency</h2>
 <p>Three digit currency code as defined by <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a></p>
@@ -7986,7 +8054,9 @@ For all input types, the card holder input may also be provided on the POI termi
 </tr>
 </tbody></table>
 <h2 id='data-dictionary-provideridentification'>ProviderIdentification</h2>
-<p>The name of the company supplying the Sale System</p>
+<p>The name of the company supplying the Sale System. </p>
+
+<p>DataMesh will provide a <code>ProviderIdentification</code> to be used for the UAT environment. Once the Sale System is certified, DataMesh will provide a <code>ProviderIdentification</code> to be included in the production build of the Sale System. </p>
 <h2 id='data-dictionary-paymentinstrumentdata'>PaymentInstrumentData</h2>
 <blockquote>
 <p>PaymentInstrumentData object</p>
@@ -8820,7 +8890,7 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 
 <p>For example, a pre-authorisation, followed by a pre-authorisation top-up, and then a completion all require the same <code>SaleReferenceID</code> in the request.</p>
 
-<p>The Sale System must ensure the <code>SaleReferenceID</code> is unique across all <code>SaleId</code>&#39;s and <code>POIID</code>&#39;s across the merchant. If Sale Systems are not synchronised, it is recommended that this value should be a <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a> to ensure uniqueness.</p>
+<p>The Sale System must ensure the <code>SaleReferenceID</code> is unique across all <a href="#data-dictionary-saleid">SaleID</a>&#39;s and <a href="#data-dictionary-poiid">POIID</a>&#39;s across the merchant. If Sale Systems are not synchronised, it is recommended that this value should be a <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a> to ensure uniqueness.</p>
 <h2 id='data-dictionary-saletransactionid'>SaleTransactionID</h2>
 <p>Identification of a transaction for a given <a href="#data-dictionary-saleid">SaleId</a>. </p>
 
@@ -8848,9 +8918,9 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 </tr>
 </tbody></table>
 <h2 id='data-dictionary-shiftnumber'>ShiftNumber</h2>
-<p>An optional value sent in the <a href="#login">Login Request</a> for information only. Used to identify the shift that drives the Sale Terminal during the session.</p>
+<p>An optional value sent in the <a href="#cloud-api-reference-methods-login">Login Request</a> for information only. Used to identify the shift that drives the Sale Terminal during the session.</p>
 
-<p>If present, totals in the <a href="#reconciliation">ReconciliationResponse</a> will be grouped by this value. If not present, payment transactions that do not specify a <code>ShiftNumber</code> will not be grouped under a <code>ShiftNumber</code>.</p>
+<p>If present, totals in the <a href="#cloud-api-reference-methods-reconciliation">ReconciliationResponse</a> will be grouped by this value. If not present, payment transactions that do not specify a <code>ShiftNumber</code> will not be grouped under a <code>ShiftNumber</code>.</p>
 
 <p>Note that different shifts may still occur during the same login session by setting a <code>ShiftNumber</code> per payment. </p>
 <h2 id='data-dictionary-serviceid'>ServiceID</h2>
@@ -8860,9 +8930,11 @@ Please contact the Data Mesh integrations team at <a href="mailto:integrations@d
 
 <p>The POI System will validate that the <code>ServiceID</code> is different from the previous request. The Sale System should validate that the <code>ServiceID</code> in the response matches the <code>ServiceID</code> sent in the request.</p>
 
-<p>The <code>ServiceID</code> is used to identify a transaction to retrieve in a <a href="#transaction-status">transaction status</a> request. </p>
+<p>The <code>ServiceID</code> is used to identify a transaction to retrieve in a <a href="#cloud-api-reference-methods-transaction-status">transaction status</a> request. </p>
 <h2 id='data-dictionary-softwareversion'>SoftwareVersion</h2>
-<p>The software version of the Sale System</p>
+<p>The software version of the Sale System.</p>
+
+<p>Must be the software version of the current Sale System build. </p>
 <h2 id='data-dictionary-splitpaymentflag'>SplitPaymentFlag</h2>
 <p>Indicates if a payment is a split payment. Default to false. </p>
 <h2 id='data-dictionary-taxcode'>TaxCode</h2>
@@ -9008,12 +9080,15 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Update the <a href="#endpoints">EndPoint</a> to the production URL</li>
 </ul>
 
-<p>Merchant checklist for go-live. e.g. 
- - Wi-Fi network performance
- - Terminals required
- - Merchant account setup / terminals required
- - Bank specific setup
- - POS configuration </p>
+<p>Merchant checklist for go-live.</p>
+
+<ul>
+<li>Wi-Fi network performance</li>
+<li>Terminals required</li>
+<li>Merchant account setup / terminals required</li>
+<li>Bank specific setup</li>
+<li>POS configuration </li>
+</ul>
 <h1 id='appendix'>Appendix</h1><h2 id='appendix-glossary-of-terms'>Glossary of terms</h2>
 <ul>
 <li><strong>API</strong> - application programming interface.</li>
@@ -9055,13 +9130,13 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>POS should support the &quot;3.1-dmg&quot; <code>mandatory features checklist</code>
 
 <ul>
-<li>Support for <a href="#perform-a-purchase">purchase</a> and <a href="#perform-a-refund">refund</a> payment types</li>
-<li>Include <a href="#product-data">product data</a> in each payment request</li>
+<li>Support for <a href="#cloud-api-reference-perform-a-purchase">purchase</a> and <a href="#cloud-api-reference-perform-a-refund">refund</a> payment types</li>
+<li>Include <a href="#cloud-api-reference-product-data">product data</a> in each payment request</li>
 <li>Additional fields will be added to the message specification over time. To ensure forwards compatibility the Sale System must ignore when extra objects and fields are present in response messages. This includes valid MAC handling in the SecurityTrailer.</li>
-<li>Support for TLS and other <a href="#security-requirements">security requirements</a></li>
+<li>Support for TLS and other <a href="#cloud-api-reference-security-requirements">security requirements</a></li>
 <li><a href="#settings-user-interface">Settings user interface</a></li>
 <li><a href="#payment-user-interface">Payments user interface</a> which handles the <code>Initial UI</code>, <code>Final UI</code>, and <code>cancelling a sale in progress</code></li>
-<li>Handle error scenarios as outlined in <a href="#error-handling">error handling</a></li>
+<li>Handle error scenarios as outlined in <a href="#cloud-api-reference-error-handling">error handling</a></li>
 <li>Ensure Sale System provides a unique <a href="#payment-identification">payment identification</a></li>
 </ul></li>
 </ul>
