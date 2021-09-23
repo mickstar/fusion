@@ -480,6 +480,9 @@
 						  <li>
 							<a href="#satellite-api-reference-methods-payment" class="toc-h3 toc-link" data-title="Payment">Payment</a>
 						  </li>
+						  <li>
+							<a href="#satellite-api-reference-methods-transaction-status" class="toc-h3 toc-link" data-title="Transaction status">Transaction status</a>
+						  </li>
 					  </ul>
                   </li>
               </ul>
@@ -810,6 +813,20 @@
           </li>
           <li>
             <a href="#production" class="toc-h1 toc-link" data-title="Production">Production</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#production-create-a-production-sale-system-build" class="toc-h2 toc-link" data-title="Create a production Sale System build">Create a production Sale System build</a>
+					
+                  </li>
+                  <li>
+                    <a href="#production-complete-pvt" class="toc-h2 toc-link" data-title="Complete PVT">Complete PVT</a>
+					
+                  </li>
+                  <li>
+                    <a href="#production-organise-a-pilot" class="toc-h2 toc-link" data-title="Organise a pilot">Organise a pilot</a>
+					
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#appendix" class="toc-h1 toc-link" data-title="Appendix">Appendix</a>
@@ -819,8 +836,20 @@
 					
                   </li>
                   <li>
-                    <a href="#appendix-protocolversion-updates-from-3-1-to-3-1-dmg" class="toc-h2 toc-link" data-title="ProtocolVersion updates from 3.1 to 3.1-dmg">ProtocolVersion updates from 3.1 to 3.1-dmg</a>
+                    <a href="#appendix-cloud-api-migrating-protocolversion-3-1-to-3-1-dmg" class="toc-h2 toc-link" data-title="Cloud API - Migrating ProtocolVersion 3.1 to 3.1-dmg">Cloud API - Migrating ProtocolVersion 3.1 to 3.1-dmg</a>
 					
+                  </li>
+                  <li>
+                    <a href="#appendix-satellite-api-migrating-to-new-api" class="toc-h2 toc-link" data-title="Satellite API - Migrating to new API">Satellite API - Migrating to new API</a>
+					
+					  <ul class="toc-list-h3">
+						  <li>
+							<a href="#appendix-satellite-api-migrating-to-new-api-intent-request" class="toc-h3 toc-link" data-title="Intent Request">Intent Request</a>
+						  </li>
+						  <li>
+							<a href="#appendix-satellite-api-migrating-to-new-api-intent-response" class="toc-h3 toc-link" data-title="Intent Response">Intent Response</a>
+						  </li>
+					  </ul>
                   </li>
                   <li>
                     <a href="#appendix-terminal-configuration" class="toc-h2 toc-link" data-title="Terminal configuration">Terminal configuration</a>
@@ -1595,7 +1624,7 @@ The amount returned in <a href="#authorizedamount">AuthorizedAmount</a> in the p
 <p>Unify utilises secure websockets for communication between Sale System and POI Server.</p>
 
 <ul>
-<li>The Sale System and merchant environment must support outgoing TCP connections to <code>*.datameshgroup.io:443</code> and <code>*.datameshgroup.io:5000</code> for both the terminal and Sale System</li>
+<li>The Sale System and merchant environment must support outgoing TCP connections to <code>*.datameshgroup.io:443</code>, <code>*.datameshgroup.io:4000</code>, and <code>*.datameshgroup.io:5000</code> for both the terminal and Sale System</li>
 <li>As a cloud service, Unify may run on several IP addresses. 
 
 <ul>
@@ -5251,7 +5280,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 </tbody></table>
 <h3 id='cloud-api-reference-methods-reconciliation'>Reconciliation</h3><h4 id='cloud-api-reference-methods-reconciliation-reconciliation-request'>Reconciliation request</h4>
 <blockquote>
-<p>Abort transaction request</p>
+<p>Reconciliation request</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"SaleToPOIRequest"</span><span class="p">:{</span><span class="w">
@@ -5556,48 +5585,37 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 <p>Card acquisition request</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"SaleToPOIRequest"</span><span class="p">:{</span><span class="w">
-    </span><span class="nl">"MessageHeader"</span><span class="p">:{</span><span class="w">
-      </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"CardAcquisition"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="s2">"Request"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"SaleID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"POIID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+  </span><span class="nl">"SaleToPOIRequest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"MessageHeader"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CardAcquisition"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Request"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"SaleID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"POIID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
     </span><span class="p">},</span><span class="w">
-    </span><span class="nl">"CardAcquisitionRequest"</span><span class="p">:{</span><span class="w">
-      </span><span class="nl">"SaleData"</span><span class="p">:{</span><span class="w">
-        </span><span class="nl">"OperatorID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"OperatorLanguage"</span><span class="p">:</span><span class="s2">"en"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"ShiftNumber"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"CustomerLanguage"</span><span class="p">:</span><span class="s2">"en"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"SaleTransactionID"</span><span class="p">:{</span><span class="w">
-          </span><span class="nl">"TransactionID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"TimeStamp"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+    </span><span class="nl">"CardAcquisitionRequest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"SaleData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"OperatorID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"OperatorLanguage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"ShiftNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"CustomerLanguage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"SaleTransactionID"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"TransactionID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"TimeStamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
         </span><span class="p">},</span><span class="w">
-        </span><span class="nl">"SaleTerminalData"</span><span class="p">:{</span><span class="w">
-          </span><span class="nl">"TerminalEnvironment"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"SaleCapabilities"</span><span class="p">:[</span><span class="w">
-            </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"…"</span><span class="w">
-          </span><span class="p">]</span><span class="w">
+        </span><span class="nl">"SaleTerminalData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"TerminalEnvironment"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"SaleCapabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="err">…</span><span class="p">]</span><span class="w">
         </span><span class="p">},</span><span class="w">
-        </span><span class="nl">"TokenRequestedType"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+        </span><span class="nl">"TokenRequestedType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Customer"</span><span class="p">,</span><span class="w">
       </span><span class="p">},</span><span class="w">
-      </span><span class="nl">"CardAcquisitionTransaction"</span><span class="p">:{</span><span class="w">
-        </span><span class="nl">"AllowedPaymentBrand"</span><span class="p">:[</span><span class="w">
-          </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="s2">"…"</span><span class="w">
-        </span><span class="p">],</span><span class="w">
-        </span><span class="nl">"ForceEntryMode"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+      </span><span class="nl">"CardAcquisitionTransaction"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"AllowedPaymentBrand"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w"> </span><span class="err">…</span><span class="p">],</span><span class="w">
+        </span><span class="nl">"ForceEntryMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
       </span><span class="p">}</span><span class="w">
     </span><span class="p">},</span><span class="w">
-    </span><span class="nl">"SecurityTrailer"</span><span class="p">:{</span><span class="err">...</span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
+    </span><span class="nl">"SecurityTrailer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p><strong>MessageHeader</strong></p>
@@ -5620,7 +5638,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 <td><a href="#data-dictionary-messagecategory">MessageCategory</a></td>
 <td>✔</td>
 <td>String</td>
-<td>&quot;Reconciliation&quot;</td>
+<td>&quot;CardAcquisition&quot;</td>
 </tr>
 <tr>
 <td><a href="#data-dictionary-messagetype">MessageType</a></td>
@@ -5749,48 +5767,53 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 <td>If present, restricts card presentment to the specified type. See <a href="#data-dictionary-forceentrymode">ForceEntryMode</a></td>
 </tr>
 </tbody></table>
-<h4 id='cloud-api-reference-methods-card-acquisition-reconciliation-response'>Reconciliation response</h4>
+<h4 id='cloud-api-reference-methods-card-acquisition-card-acquisition-response'>Card acquisition response</h4>
 <blockquote>
-<p>Reconciliation response</p>
+<p>Card acquisition response</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"SaleToPOIResponse"</span><span class="p">:{</span><span class="w">
-    </span><span class="nl">"MessageHeader"</span><span class="p">:{</span><span class="w">
-      </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"Reconciliation"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="s2">"Response"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"SaleID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"POIID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+  </span><span class="nl">"SaleToPOIResponse"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"MessageHeader"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CardAcquisition"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Response"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"SaleID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"POIID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
     </span><span class="p">},</span><span class="w">
-    </span><span class="nl">"ReconciliationResponse"</span><span class="p">:{</span><span class="w">
-      </span><span class="nl">"Response"</span><span class="p">:{</span><span class="w">
-        </span><span class="nl">"Result"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"ErrorCondition"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"AdditionalResponse"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+    </span><span class="nl">"CardAcquisitionResponse"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"Response"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"Result"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"ErrorCondition"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"AdditionalResponse"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
       </span><span class="p">},</span><span class="w">
-      </span><span class="nl">"ReconciliationType"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"POIReconciliationID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"TransactionTotals"</span><span class="p">:[</span><span class="w">
-        </span><span class="p">{</span><span class="w">
-          </span><span class="nl">"PaymentInstrumentType"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"CardBrand"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"OperatorID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"ShiftNumber"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"TotalsGroupID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"PaymentCurrency"</span><span class="p">:</span><span class="s2">"AUD"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"PaymentTotals"</span><span class="p">:[</span><span class="w">
-            </span><span class="p">{</span><span class="w">
-              </span><span class="nl">"TransactionType"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-              </span><span class="nl">"TransactionCount"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
-              </span><span class="nl">"TransactionAmount"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-          </span><span class="p">]</span><span class="w">
+      </span><span class="nl">"SaleData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"SaleTransactionID"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"TransactionID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"TimeStamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"POIData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"POITransactionID"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"TransactionID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"TimeStamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"PaymentInstrumentData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"PaymentInstrumentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"CardData"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"MaskedPAN"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxxxxx......xxxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"EntryMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
+          </span><span class="p">},</span><span class="w">
+          </span><span class="nl">"PaymentToken"</span><span class="p">:</span><span class="w">  </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"TokenRequestedType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"TokenValue"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"ExpiryDateTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxx"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
         </span><span class="p">}</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-    </span><span class="p">},</span><span class="w">
-    </span><span class="nl">"SecurityTrailer"</span><span class="p">:{</span><span class="err">...</span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"SecurityTrailer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="err">...</span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p><strong>MessageHeader</strong></p>
@@ -5813,7 +5836,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 <td><a href="#data-dictionary-messagecategory">MessageCategory</a></td>
 <td>✔</td>
 <td>String</td>
-<td>&quot;Reconciliation&quot;</td>
+<td>&quot;CardAcquisition&quot;</td>
 </tr>
 <tr>
 <td><a href="#data-dictionary-messagetype">MessageType</a></td>
@@ -5841,7 +5864,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 </tr>
 </tbody></table>
 
-<p><strong>ReconciliationResponse</strong></p>
+<p><strong>CardAcquisitionResponse</strong></p>
 
 <table><thead>
 <tr>
@@ -5852,7 +5875,7 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 </tr>
 </thead><tbody>
 <tr>
-<td><em>Response</em></td>
+<td><strong>Response</strong></td>
 <td>✔</td>
 <td>Object</td>
 <td>Object indicating the result of the login</td>
@@ -5876,82 +5899,106 @@ After sending a cancel transaction request, the Sale System should <b>always</b>
 <td>Provides additional error information. Only present when <code>Result</code> is &quot;Failure&quot;. See <a href="#data-dictionary-additionalresponse">AdditionalResponse</a> for more information on possible values.</td>
 </tr>
 <tr>
-<td><a href="#reconciliationtype">ReconciliationType</a></td>
+<td><strong>SaleData</strong></td>
+<td>✔</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td> <strong>SaleTransactionID</strong></td>
+<td>✔</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-transactionid">TransactionID</a></td>
 <td>✔</td>
 <td>String</td>
-<td>Mirrored from request</td>
+<td>Mirrored from the request</td>
 </tr>
 <tr>
-<td><a href="#data-dictionary-poireconciliationid">POIReconciliationID</a></td>
-<td></td>
-<td>String</td>
-<td>Present if <code>Result</code> is &quot;Success&quot;. The <code>ReconciliationID</code> of the period requested</td>
-</tr>
-<tr>
-<td><em>TransactionTotals</em></td>
-<td></td>
-<td>Array</td>
-<td>Present if <code>Result</code> is &quot;Success&quot;. An array of totals grouped by card brand, then operator, then shift, then TotalsGroupID, then payment currency.</td>
-</tr>
-<tr>
-<td> <a href="#data-dictionary-paymentinstrumenttype">PaymentInstrumentType</a></td>
+<td>  <a href="#data-dictionary-timestamp">TimeStamp</a></td>
 <td>✔</td>
 <td>String</td>
-<td>&quot;Card&quot; (card payment) or &quot;Mobile&quot; (phone/QR code payments)</td>
+<td>Mirrored from the request</td>
 </tr>
 <tr>
-<td> <a href="#data-dictionary-cardbrand">CardBrand</a></td>
+<td> <a href="#data-dictionary-salereferenceid">SaleReferenceID</a></td>
 <td></td>
 <td>String</td>
-<td>A card brand used during this reconciliation period. See <a href="#data-dictionary-cardbrand">CardBrand</a></td>
+<td>Mirrored from the request</td>
 </tr>
 <tr>
-<td> <a href="#data-dictionary-operatorid">OperatorID</a></td>
+<td><strong>POIData</strong></td>
+<td>✔</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td> <strong>POITransactionID</strong></td>
+<td>✔</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-transactionid">TransactionID</a></td>
+<td>✔</td>
+<td>String</td>
+<td>A unique transaction id from the POI system</td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-timestamp">TimeStamp</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Time on the POI system, formatted as <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a></td>
+</tr>
+<tr>
+<td> <strong><a href="#data-dictionary-paymentinstrumentdata">PaymentInstrumentData</a></strong></td>
+<td></td>
+<td>Object</td>
+<td>Object with represents card details for token or manually enter card details.</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-paymentinstrumenttype">PaymentInstrumentType</a></td>
 <td></td>
 <td>String</td>
-<td>An operator id used during this reconciliation period</td>
+<td>Defaults to &quot;Card&quot;. Indicates the card source for the payment. See <a href="#data-dictionary-paymentinstrumenttype">PaymentInstrumentType</a></td>
 </tr>
 <tr>
-<td> <a href="#data-dictionary-shiftnumber">ShiftNumber</a></td>
+<td><strong>CardData</strong></td>
+<td></td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-entrymode">EntryMode</a></td>
 <td></td>
 <td>String</td>
-<td>A shift number used during the reconciliation period</td>
+<td>Only present if <code>PaymentInstrumentType</code> is &quot;Card&quot;. &quot;File&quot; if a Payment Token is used, and &quot;Keyed&quot; for a Card Not Present transaction.</td>
 </tr>
 <tr>
-<td> <a href="#data-dictionary-totalsgroupid">TotalsGroupID</a></td>
-<td></td>
+<td> <a href="#data-dictionary-maskedpan">MaskedPAN</a></td>
+<td>✔</td>
 <td>String</td>
-<td>A custom grouping of transactions as defined by the Sale System</td>
+<td>PAN masked with dots, first 6 and last 4 digits visible</td>
 </tr>
 <tr>
-<td> <a href="#data-dictionary-paymentcurrency">PaymentCurrency</a></td>
-<td></td>
+<td> <strong>PaymentToken</strong></td>
+<td>✔</td>
+<td>Object</td>
+<td>Only present if <a href="#data-dictionary-entrymode">EntryMode</a> is &quot;File&quot;. Object with identifies the payment token.</td>
+</tr>
+<tr>
+<td>  <a href="#data-dictionary-tokenrequestedtype">TokenRequestedType</a></td>
+<td>✔</td>
 <td>String</td>
-<td>&quot;AUD&quot;</td>
+<td>&quot;Transaction&quot; or &quot;Customer&quot;. Must match the type of token recorded in the POI System.</td>
 </tr>
 <tr>
-<td> <em>PaymentTotals</em></td>
-<td></td>
-<td>Array</td>
-<td>An array [0..10] of totals grouped by transaction payment type. Present if both <code>TransactionCount</code> and <code>TransactionAmount</code> are not equal to zero</td>
-</tr>
-<tr>
-<td>  <a href="#data-dictionary-transactiontype">TransactionType</a></td>
-<td></td>
+<td>  <a href="#tokenvalue">TokenValue</a></td>
+<td>✔</td>
 <td>String</td>
-<td>Transaction type for this payment. See <a href="#data-dictionary-transactiontype">TransactionType</a></td>
-</tr>
-<tr>
-<td>  <a href="#transactioncount">TransactionCount</a></td>
-<td></td>
-<td>String</td>
-<td>The number of transactions for the transaction type for the current grouping of transactions</td>
-</tr>
-<tr>
-<td>  <a href="#transactionamount">TransactionAmount</a></td>
-<td></td>
-<td>Number</td>
-<td>The total amount of transactions for the transaction type for the current grouping of transactions</td>
+<td>Token previously returned from the POI System in the payment, or card acquisition response</td>
 </tr>
 </tbody></table>
 <h2 id='cloud-api-reference-error-handling'>Error handling</h2>
@@ -7318,6 +7365,234 @@ In most cases the Sale System should attempt to
 <td>✔</td>
 <td>String</td>
 <td>The payment receipt in XHTML format but coded in BASE64</td>
+</tr>
+</tbody></table>
+<h3 id='satellite-api-reference-methods-transaction-status'>Transaction status</h3>
+<p>A transaction status request can be used to obtain the status of a previous transaction. Required for error handling. </p>
+<h4 id='satellite-api-reference-methods-transaction-status-transaction-status-request'>Transaction status request</h4>
+<blockquote>
+<p>Transaction status request</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"SaleToPOIRequest"</span><span class="p">:{</span><span class="w">
+      </span><span class="nl">"MessageHeader"</span><span class="p">:{</span><span class="w">
+         </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"TransactionStatus"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="s2">"Request"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"TransactionStatusRequest"</span><span class="p">:{</span><span class="w">
+         </span><span class="nl">"MessageReference"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p><strong>MessageHeader</strong></p>
+
+<table><thead>
+<tr>
+<th><div style="width:180px">Attribute</div></th>
+<th>Requ.</th>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#data-dictionary-messageclass">MessageClass</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;Service&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-messagecategory">MessageCategory</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;TransactionStatus&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-messagetype">MessageType</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;Request&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-serviceid">ServiceID</a></td>
+<td>✔</td>
+<td>String</td>
+<td>A unique value which will be mirrored in the response. See <a href="#data-dictionary-serviceid">ServiceID</a>.</td>
+</tr>
+</tbody></table>
+
+<p><strong>TransactionStatusRequest</strong></p>
+
+<table><thead>
+<tr>
+<th><div style="width:180px">Attribute</div></th>
+<th>Requ.</th>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><em>MessageReference</em></td>
+<td></td>
+<td>Object</td>
+<td>Identification of a previous POI transaction. Present if it contains any data.</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-messagecategory">MessageCategory</a></td>
+<td></td>
+<td>String</td>
+<td>&quot;Payment&quot;</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-serviceid">ServiceID</a></td>
+<td></td>
+<td>String</td>
+<td>The <a href="#data-dictionary-serviceid">ServiceID</a> of the transaction to retrieve the status of. If not included the last payment status is returned.</td>
+</tr>
+</tbody></table>
+<h4 id='satellite-api-reference-methods-transaction-status-transaction-status-response'>Transaction status response</h4>
+<blockquote>
+<p>Transaction status response</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"SaleToPOIResponse"</span><span class="p">:{</span><span class="w">
+      </span><span class="nl">"MessageHeader"</span><span class="p">:{</span><span class="w">
+         </span><span class="nl">"MessageClass"</span><span class="p">:</span><span class="s2">"Service"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"TransactionStatus"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"MessageType"</span><span class="p">:</span><span class="s2">"Response"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"TransactionStatusResponse"</span><span class="p">:{</span><span class="w">
+         </span><span class="nl">"Response"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"Result"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"ErrorCondition"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"AdditionalResponse"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+         </span><span class="p">},</span><span class="w">
+         </span><span class="nl">"MessageReference"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"MessageCategory"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"ServiceID"</span><span class="p">:</span><span class="s2">"xxx"</span><span class="w">
+         </span><span class="p">},</span><span class="w">
+         </span><span class="nl">"RepeatedMessageResponse"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"MessageHeader"</span><span class="p">:{</span><span class="err">...</span><span class="p">},</span><span class="w">
+            </span><span class="nl">"RepeatedResponseMessageBody"</span><span class="p">:{</span><span class="w">
+               </span><span class="nl">"PaymentResponse"</span><span class="p">:{</span><span class="err">...</span><span class="p">},</span><span class="w">
+               </span><span class="nl">"ReversalResponse"</span><span class="p">:{</span><span class="err">...</span><span class="p">}</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p><strong>MessageHeader</strong></p>
+
+<table><thead>
+<tr>
+<th><div style="width:180px">Attribute</div></th>
+<th>Requ.</th>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#data-dictionary-messageclass">MessageClass</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;Service&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-messagecategory">MessageCategory</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;TransactionStatus&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-messagetype">MessageType</a></td>
+<td>✔</td>
+<td>String</td>
+<td>&quot;Response&quot;</td>
+</tr>
+<tr>
+<td><a href="#data-dictionary-serviceid">ServiceID</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Mirrored from request</td>
+</tr>
+</tbody></table>
+
+<p><strong>TransactionStatusResponse</strong></p>
+
+<table><thead>
+<tr>
+<th><div style="width:180px">Attribute</div></th>
+<th>Requ.</th>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><em>Response</em></td>
+<td>✔</td>
+<td>Object</td>
+<td>Object indicating the result of the payment</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-result">Result</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Indicates the result of the response. Possible values are &quot;Success&quot; and &quot;Failure&quot;</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-errorcondition">ErrorCondition</a></td>
+<td></td>
+<td>String</td>
+<td>Indicates the reason an error occurred. Only present when <code>Result</code> is &quot;Failure&quot;. See <a href="#data-dictionary-errorcondition">ErrorCondition</a> for more information on possible values.</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-additionalresponse">AdditionalResponse</a></td>
+<td></td>
+<td>String</td>
+<td>Provides additional error information. Only present when <code>Result</code> is &quot;Failure&quot;. See <a href="#data-dictionary-additionalresponse">AdditionalResponse</a> for more information on possible values.</td>
+</tr>
+<tr>
+<td><em>MessageReference</em></td>
+<td></td>
+<td>Object</td>
+<td>Identification of a previous POI transaction. Present if <code>Result</code> is &quot;Success&quot;, or <code>Result</code> is &quot;Failure&quot; and <code>ErrorCondition</code> is &quot;InProgress&quot;</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-messagecategory">MessageCategory</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Mirrored from request</td>
+</tr>
+<tr>
+<td> <a href="#data-dictionary-serviceid">ServiceID</a></td>
+<td>✔</td>
+<td>String</td>
+<td>Mirrored from request, or <code>ServiceID</code> of last transaction if not present in request.</td>
+</tr>
+<tr>
+<td><em>RepeatedMessageResponse</em></td>
+<td></td>
+<td>Object</td>
+<td>Present if <code>Result</code> is &quot;Success&quot;</td>
+</tr>
+<tr>
+<td> <em>MessageHeader</em></td>
+<td>✔</td>
+<td>Object</td>
+<td><code>MessageHeader</code> of the requested payment</td>
+</tr>
+<tr>
+<td> <em>PaymentResponse</em></td>
+<td>✔</td>
+<td>Object</td>
+<td><code>PaymentResponse</code> of the requested payment</td>
 </tr>
 </tbody></table>
 <h1 id='data-dictionary'>Data dictionary</h1><h2 id='data-dictionary-account'>Account</h2>
@@ -9062,9 +9337,7 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <h2 id='data-dictionary-unitprice'>UnitPrice</h2>
 <p>Price per item unit</p>
 <h1 id='testing'>Testing</h1>
-<aside class="notice">Pending...</aside>
-
-<p>Download the Fusion accreditation script, complete and return to <a href="mailto:integrations@datameshgroup.com">integrations@datameshgroup.com</a></p>
+<p>Discuss testing requirements with <a href="mailto:integrations@datameshgroup.com">integrations@datameshgroup.com</a></p>
 
 <!--
 - Spreadsheet to include tests on 
@@ -9073,21 +9346,43 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
   - Test timeouts etc
 -->
 <h1 id='production'>Production</h1>
-<p>The production build of the Sale System should include the following: </p>
+<p>After testing and accreditation are complete, follow the production readiness checklist below:</p>
 
 <ul>
-<li>A production <a href="#data-dictionary-certificationcode">CertificationCode</a>, provided by DataMesh after successful accreditation </li>
-<li>Update the <a href="#endpoints">EndPoint</a> to the production URL</li>
+<li><a href="#production-create-production-sale-system-build">Create production Sale System build</a></li>
+<li><a href="#production-complete-pvt">Complete PVT</a></li>
+<li><a href="#production-organise-a-pilot">Organise a pilot</a></li>
 </ul>
-
-<p>Merchant checklist for go-live.</p>
+<h2 id='production-create-a-production-sale-system-build'>Create a production Sale System build</h2>
+<ul>
+<li>If the Sale System is using a DataMesh library, ensure it is updated to the latest version</li>
+<li>Update the Sale System &quot;static&quot; settings to the production values provided by DataMesh. Settings to be updated are listed below. See <a href="#design-your-integration-sale-system-settings">Sale System settings</a> for more information.
 
 <ul>
-<li>Wi-Fi network performance</li>
-<li>Terminals required</li>
-<li>Merchant account setup / terminals required</li>
-<li>Bank specific setup</li>
-<li>POS configuration </li>
+<li><code>ProviderIdentification</code>, the name of the busniess which creates the Sale System.</li>
+<li><code>ApplicationName</code>, the name of the Sale System.</li>
+<li><code>CertificationCode</code>, a GUID which uniquly identifies the Sale System. </li>
+<li><code>SoftwareVersion</code>, the internal build version of this Sale System. DataMesh must configure this value on Unify. </li>
+</ul></li>
+<li>Ensure the Sale System is connecting to the <a href="#cloud-api-reference-endpoints">production endpoint</a>.
+
+<ul>
+<li>The production endpoint uses a different <a href="#cloud-api-reference-security">SSL certificate</a>.</li>
+</ul></li>
+</ul>
+<h2 id='production-complete-pvt'>Complete PVT</h2>
+<p><a href="(mailto:integrations@datameshgroup.com)">Contact DataMesh</a> to orgainse a production verification testing window.</p>
+
+<p>This process involves working with a DataMesh representative to pair your production Sale System build with a production POI Terminal, and running through some basic tests.</p>
+<h2 id='production-organise-a-pilot'>Organise a pilot</h2>
+<p>Work with DataMesh to co-ordinate on a pilot site. </p>
+
+<ul>
+<li>Before the pilot, ensure they have been updated to the correct Sale System version </li>
+<li>If the POI Terminal will be utilising Wi-Fi, ensure it is available at all required locations in the pilot site</li>
+<li>Check that any network firewalls allow outgoing connections to ports 443, 4000, and 5000</li>
+<li>Ensure a Sale System support representative is available for the pilot </li>
+<li>DataMesh will work with the customer to create the required accounts, configure and deliver terminals </li>
 </ul>
 <h1 id='appendix'>Appendix</h1><h2 id='appendix-glossary-of-terms'>Glossary of terms</h2>
 <ul>
@@ -9113,7 +9408,7 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li><strong>Unify</strong> - the DataMesh payment switch</li>
 <li><strong>UUID</strong> - universally unique identifier.</li>
 </ul>
-<h2 id='appendix-protocolversion-updates-from-3-1-to-3-1-dmg'>ProtocolVersion updates from 3.1 to 3.1-dmg</h2>
+<h2 id='appendix-cloud-api-migrating-protocolversion-3-1-to-3-1-dmg'>Cloud API - Migrating ProtocolVersion 3.1 to 3.1-dmg</h2>
 <p>The DataMesh API supports two versions. 
 - &quot;3.1&quot; is based on the Nexo 3.1 standard
 - &quot;3.1-dmg&quot; is &quot;3.1&quot; with additional fields added by DataMesh which are outside the Nexo standard (e.g. surcharge)</p>
@@ -9140,6 +9435,113 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Ensure Sale System provides a unique <a href="#payment-identification">payment identification</a></li>
 </ul></li>
 </ul>
+<h2 id='appendix-satellite-api-migrating-to-new-api'>Satellite API - Migrating to new API</h2>
+<p>The previous Satellite API has been updated so that both the Fusion Satellite API and Fusion Cloud API share a common data model.</p>
+
+<p>The following is a guide for updating a previous integration to the new data model. </p>
+<h3 id='appendix-satellite-api-migrating-to-new-api-intent-request'>Intent Request</h3>
+<table><thead>
+<tr>
+<th>Old Field</th>
+<th>New Field</th>
+<th>Notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TransType</td>
+<td><a href="#data-dictionary-paymenttype">PaymentData.PaymentType</a></td>
+<td></td>
+</tr>
+<tr>
+<td>Amount</td>
+<td><a href="#data-dictionary-requestedamount">PaymentTransaction.AmountsReq.RequestedAmount</a></td>
+<td>Amount was represented as an integer &#39;cents&#39; in the previous API, where the new API <code>RequestedAmount</code> is represented as decimal dollar and cents</td>
+</tr>
+<tr>
+<td>CashOut</td>
+<td><a href="#data-dictionary-cashbackamount">PaymentTransaction.AmountsReq.CashBackAmount</a></td>
+<td>CashOut was represented as an integer &#39;cents&#39; in the previous API, where the new API <code>CashBackAmount</code> is represented as decimal dollar and cents</td>
+</tr>
+<tr>
+<td>POS</td>
+<td>ApplicationName</td>
+<td>Set as extra data in the intent, not part of the <code>Request</code> json object</td>
+</tr>
+<tr>
+<td>Source</td>
+<td>SoftwareVersion</td>
+<td>Only include the software version, not the POS name. Set as extra data in the intent, not part of the <code>Request</code> json object</td>
+</tr>
+</tbody></table>
+<h3 id='appendix-satellite-api-migrating-to-new-api-intent-response'>Intent Response</h3>
+<table><thead>
+<tr>
+<th>Old Field</th>
+<th>New Field</th>
+<th>Notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TransState</td>
+<td><a href="#data-dictionary-result">Response.Result</a></td>
+<td></td>
+</tr>
+<tr>
+<td>TransID</td>
+<td><a href="#data-dictionary-poitransactionid">POIData.POITransactionID.TransactionID</a></td>
+<td></td>
+</tr>
+<tr>
+<td>TerminalID</td>
+<td><a href="#data-dictionary-acquirerpoiid">PaymentResult.PaymentAcquirerData.AcquirerPOIID</a></td>
+<td></td>
+</tr>
+<tr>
+<td>PAN</td>
+<td><a href="#data-dictionary-maskedpan">PaymentResult.PaymentInstrumentData.CardData.MaskedPAN</a></td>
+<td></td>
+</tr>
+<tr>
+<td>Totalamount</td>
+<td><a href="#data-dictionary-authorizedamount">PaymentResult.AmountsResp.AuthorizedAmount</a></td>
+<td>Totalamount was represented as an integer &#39;cents&#39; in the previous API, where the new API <code>AuthorizedAmount</code> is represented as decimal dollar and cents. Note the may not match <a href="#data-dictionary-authorizedamount">AuthorizedAmount</a> may not match the <a href="#data-dictionary-requestedamount">RequestedAmount</a>. If implementing tipping or surcharge, the POS should also check for <a href="#data-dictionary-tipamount">TipAmount</a> and <a href="#data-dictionary-surchargeamount">SurchargeAmount</a>.</td>
+</tr>
+<tr>
+<td>STAN</td>
+<td><a href="#data-dictionary-stan">PaymentResult.PaymentAcquirerData.STAN</a></td>
+<td></td>
+</tr>
+<tr>
+<td>AcqRRN</td>
+<td><a href="#data-dictionary-rrn">PaymentResult.PaymentAcquirerData.RRN</a></td>
+<td></td>
+</tr>
+<tr>
+<td>TransDateTime</td>
+<td><a href="#data-dictionary-poitransactionid">POIData.POITransactionID.TimeStamp</a></td>
+<td></td>
+</tr>
+<tr>
+<td>EntryMode</td>
+<td><a href="#data-dictionary-entrymode">PaymentResult.PaymentInstrumentData.CardData.EntryMode</a></td>
+<td></td>
+</tr>
+<tr>
+<td>MerchantID</td>
+<td><a href="#data-dictionary-merchantid">PaymentResult.PaymentAcquirerData.MerchantID</a></td>
+<td></td>
+</tr>
+<tr>
+<td>HostErrorCode</td>
+<td><a href="#data-dictionary-responsecode">PaymentResult.PaymentAcquirerData.ResponseCode</a></td>
+<td></td>
+</tr>
+<tr>
+<td>TokenValue</td>
+<td><a href="#data-dictionary-tokenvalue">PaymentResult.PaymentInstrumentData.PaymentToken.TokenValue</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='appendix-terminal-configuration'>Terminal configuration</h2><h3 id='appendix-terminal-configuration-pax-terminals'>PAX terminals</h3><h4 id='appendix-terminal-configuration-pax-terminals-enable-access-to-the-home-screen'>Enable access to the home screen</h4>
 <p>In a production environment a terminal will typically be locked to the payment application, however in development and test it is useful to enable access to the home screen. </p>
 
@@ -9236,6 +9638,32 @@ If a `Payment` is requested using a PaymentToken of the same TokenRequestedType 
 <li>Swipe down again to expand the notification shade</li>
 <li>Top left icon will be your Wi-Fi status and connected access point</li>
 </ul>
+<h4 id='appendix-terminal-configuration-pax-terminals-loading-a-custom-apk'>Loading a custom APK</h4>
+<p>For Fusion Satellite integrations, the DataMesh debug development POI terminals are configured to allow loading of custom APK&#39;s.</p>
+
+<p>There are two methods for completing this process: </p>
+
+<ol>
+<li>Connect the terminal to Android Development Studio
+
+<ul>
+<li>Connect the USB port on the side of the POI Terminal to your PC</li>
+<li>The terminal will appear in the list of connected devices in Android Development Studio</li>
+<li>You can choose to either deploy or debug your custom APK on the terminal</li>
+</ul></li>
+<li>Copy the APK to the terminal
+
+<ul>
+<li>Connect the USB port on the side of the POI Terminal to your PC</li>
+<li>The terminal will appear as &quot;MTP USB Device&quot; in the PC file manager</li>
+<li>Navigate to &quot;MTP USB Device&quot;, and copy your APK to the terminal &quot;download&quot; directory</li>
+<li><img src="images/load-apk-01-5a067e5c.png" alt="" /><br></li>
+<li>On the terminal, launch &quot;File Manager&quot; and navigate to the &quot;download&quot; directory.</li>
+<li><img src="images/load-apk-02-049a0f69.png" alt="" /><br></li>
+<li>Tap your APK version and accept the install.</li>
+<li><img src="images/load-apk-03-dc784a96.png" alt="" /><br></li>
+</ul></li>
+</ol>
 
       </div>
       <div class="dark-box">
