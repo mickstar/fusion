@@ -25,7 +25,7 @@
 - **UUID** - universally unique identifier.
 
 
-## ProtocolVersion updates from 3.1 to 3.1-dmg
+## Cloud API - Migrating ProtocolVersion 3.1 to 3.1-dmg
 
 The DataMesh API supports two versions. 
 - "3.1" is based on the Nexo 3.1 standard
@@ -49,6 +49,41 @@ Breaking changes when moving from "3.1" to "3.1-dmg"
   - Handle error scenarios as outlined in [error handling](#cloud-api-reference-error-handling)
   - Ensure Sale System provides a unique [payment identification](#payment-identification)
 
+
+## Satellite API - Migrating to new API
+
+The previous Satellite API has been updated so that both the Fusion Satellite API and Fusion Cloud API share a common data model.
+
+The following is a guide for updating a previous integration to the new data model. 
+
+### Intent Request
+
+Old Field            | New Field                                                         | Notes                |
+-------------------- | -------------------                                               | -------------------- |
+TransType            | [PaymentData.PaymentType](#data-dictionary-paymenttype)           |                      |
+Amount               | [PaymentTransaction.AmountsReq.RequestedAmount](#data-dictionary-requestedamount) | Amount was represented as an integer 'cents' in the previous API, where the new API `RequestedAmount` is represented as decimal dollar and cents | 
+CashOut              | [PaymentTransaction.AmountsReq.CashBackAmount](#data-dictionary-cashbackamount) | CashOut was represented as an integer 'cents' in the previous API, where the new API `CashBackAmount` is represented as decimal dollar and cents | 
+POS                  | ApplicationName | Set as extra data in the intent, not part of the `Request` json object |
+Source               | SoftwareVersion | Only include the software version, not the POS name. Set as extra data in the intent, not part of the `Request` json object |
+
+
+### Intent Response
+
+Old Field            | New Field                                                         | Notes                |
+-------------------- | -------------------                                               | -------------------- |
+TransState           | [Response.Result](#data-dictionary-result)                        |                      |
+TransID              | [POIData.POITransactionID.TransactionID](#data-dictionary-poitransactionid) | |
+TerminalID           | [PaymentResult.PaymentAcquirerData.AcquirerPOIID](#data-dictionary-acquirerpoiid) | |
+PAN                  | [PaymentResult.PaymentInstrumentData.CardData.MaskedPAN](#data-dictionary-maskedpan) |  |
+Totalamount          | [PaymentResult.AmountsResp.AuthorizedAmount](#data-dictionary-authorizedamount) | Totalamount was represented as an integer 'cents' in the previous API, where the new API `AuthorizedAmount` is represented as decimal dollar and cents. Note the may not match [AuthorizedAmount](#data-dictionary-authorizedamount) may not match the [RequestedAmount](#data-dictionary-requestedamount). If implementing tipping or surcharge, the POS should also check for [TipAmount](#data-dictionary-tipamount) and [SurchargeAmount](#data-dictionary-surchargeamount). |
+STAN                 | [PaymentResult.PaymentAcquirerData.STAN](#data-dictionary-stan) |  |
+AcqRRN               | [PaymentResult.PaymentAcquirerData.RRN](#data-dictionary-rrn) |  |
+TransDateTime        | [POIData.POITransactionID.TimeStamp](#data-dictionary-poitransactionid) |  |
+EntryMode            | [PaymentResult.PaymentInstrumentData.CardData.EntryMode](#data-dictionary-entrymode) |  |
+MerchantID           | [PaymentResult.PaymentAcquirerData.MerchantID](#data-dictionary-merchantid) |  |
+HostErrorCode        | [PaymentResult.PaymentAcquirerData.ResponseCode](#data-dictionary-responsecode) |  |
+TokenValue           | [PaymentResult.PaymentInstrumentData.PaymentToken.TokenValue](#data-dictionary-tokenvalue) |  |
+    
 
 
 
@@ -141,3 +176,25 @@ To check Wi-FI connection status at any time:
 - Swipe down again to expand the notification shade
 - Top left icon will be your Wi-Fi status and connected access point
 
+#### Loading a custom APK
+
+For Fusion Satellite integrations, the DataMesh debug development POI terminals are configured to allow loading of custom APK's.
+
+There are two methods for completing this process: 
+
+1. Connect the terminal to Android Development Studio
+  - Connect the USB port on the side of the POI Terminal to your PC
+  - The terminal will appear in the list of connected devices in Android Development Studio
+  - You can choose to either deploy or debug your custom APK on the terminal
+1. Copy the APK to the terminal
+  - Connect the USB port on the side of the POI Terminal to your PC
+  - The terminal will appear as "MTP USB Device" in the PC file manager
+  - Navigate to "MTP USB Device", and copy your APK to the terminal "download" directory
+  - ![](images/load-apk-01.png)  
+  - On the terminal, launch "File Manager" and navigate to the "download" directory.
+  - ![](images/load-apk-02.png)  
+  - Tap your APK version and accept the install.
+  - ![](images/load-apk-03.png)  
+
+  
+  

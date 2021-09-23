@@ -615,3 +615,118 @@ The payment message is used to perform purchase, purchase + cash out, cash out o
   **OutputContent**                           |  | Array | Array of payment receipt objects which represent receipts to be printed
    [OutputFormat](#data-dictionary-outputformat)              | ✔ | String | "XHTML"  
    [OutputXHTML](#data-dictionary-outputxhtml)                | ✔ | String | The payment receipt in XHTML format but coded in BASE64 
+
+
+
+
+
+
+
+
+
+
+
+
+### Transaction status 
+
+A transaction status request can be used to obtain the status of a previous transaction. Required for error handling. 
+
+#### Transaction status request
+
+> Transaction status request
+
+```json
+{
+   "SaleToPOIRequest":{
+      "MessageHeader":{
+         "MessageClass":"Service",
+         "MessageCategory":"TransactionStatus",
+         "MessageType":"Request",
+         "ServiceID":"xxx"
+      },
+      "TransactionStatusRequest":{
+         "MessageReference":{
+            "MessageCategory":"xxx",
+            "ServiceID":"xxx"
+         }
+      }
+   }
+}
+```
+
+**MessageHeader**
+
+<div style="width:180px">Attribute</div>  |Requ.| Format | Description |
+-----------------                         |----| ------ | ----------- |
+[MessageClass](#data-dictionary-messageclass)             | ✔ | String | "Service"
+[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "TransactionStatus"
+[MessageType](#data-dictionary-messagetype)               | ✔ | String | "Request"
+[ServiceID](#data-dictionary-serviceid)                   | ✔ | String | A unique value which will be mirrored in the response. See [ServiceID](#data-dictionary-serviceid).
+
+**TransactionStatusRequest**
+
+<div style="width:180px">Attribute</div>      |Requ.| Format  | Description |
+-----------------                             |----| ------ | ----------- |
+*MessageReference*                            |    | Object | Identification of a previous POI transaction. Present if it contains any data. 
+ [MessageCategory](#data-dictionary-messagecategory)          |    | String | "Payment"
+ [ServiceID](#data-dictionary-serviceid)                      |    | String | The [ServiceID](#data-dictionary-serviceid) of the transaction to retrieve the status of. If not included the last payment status is returned.
+
+
+#### Transaction status response
+
+> Transaction status response
+
+```json
+{
+   "SaleToPOIResponse":{
+      "MessageHeader":{
+         "MessageClass":"Service",
+         "MessageCategory":"TransactionStatus",
+         "MessageType":"Response",
+         "ServiceID":"xxx"
+      },
+      "TransactionStatusResponse":{
+         "Response":{
+            "Result":"xxx",
+            "ErrorCondition":"xxx",
+            "AdditionalResponse":"xxx"
+         },
+         "MessageReference":{
+            "MessageCategory":"xxx",
+            "ServiceID":"xxx"
+         },
+         "RepeatedMessageResponse":{
+            "MessageHeader":{...},
+            "RepeatedResponseMessageBody":{
+               "PaymentResponse":{...},
+               "ReversalResponse":{...}
+            }
+         }
+      }
+   }
+}
+```
+
+**MessageHeader**
+
+<div style="width:180px">Attribute</div>  |Requ.| Format | Description |
+-----------------                         |----| ------ | ----------- |
+[MessageClass](#data-dictionary-messageclass)             | ✔ | String | "Service"
+[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "TransactionStatus"
+[MessageType](#data-dictionary-messagetype)               | ✔ | String | "Response"
+[ServiceID](#data-dictionary-serviceid)                   | ✔ | String | Mirrored from request
+
+**TransactionStatusResponse**
+
+<div style="width:180px">Attribute</div>      |Requ.| Format  | Description |
+-----------------                             |----| ------ | ----------- |
+*Response*                                    | ✔ | Object | Object indicating the result of the payment
+ [Result](#data-dictionary-result)                            | ✔ | String | Indicates the result of the response. Possible values are "Success" and "Failure"
+ [ErrorCondition](#data-dictionary-errorcondition)            |  | String | Indicates the reason an error occurred. Only present when `Result` is "Failure". See [ErrorCondition](#data-dictionary-errorcondition) for more information on possible values.
+ [AdditionalResponse](#data-dictionary-additionalresponse)    |  | String | Provides additional error information. Only present when `Result` is "Failure". See [AdditionalResponse](#data-dictionary-additionalresponse) for more information on possible values. 
+*MessageReference*                            |  | Object | Identification of a previous POI transaction. Present if `Result` is "Success", or `Result` is "Failure" and `ErrorCondition` is "InProgress"
+ [MessageCategory](#data-dictionary-messagecategory)          | ✔ | String | Mirrored from request
+ [ServiceID](#data-dictionary-serviceid)                      | ✔ | String | Mirrored from request, or `ServiceID` of last transaction if not present in request.
+*RepeatedMessageResponse*                     |  | Object | Present if `Result` is "Success"
+ *MessageHeader*                              | ✔ | Object | `MessageHeader` of the requested payment
+ *PaymentResponse*                            | ✔ | Object | `PaymentResponse` of the requested payment

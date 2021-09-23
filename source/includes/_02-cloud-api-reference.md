@@ -12,7 +12,7 @@ The Fusion Cloud API allows the Sale System to communicate with a POI terminal v
 
 Unify utilises secure websockets for communication between Sale System and POI Server.
 
-- The Sale System and merchant environment must support outgoing TCP connections to `*.datameshgroup.io:443` and `*.datameshgroup.io:5000` for both the terminal and Sale System
+- The Sale System and merchant environment must support outgoing TCP connections to `*.datameshgroup.io:443`, `*.datameshgroup.io:4000`, and `*.datameshgroup.io:5000` for both the terminal and Sale System
 - As a cloud service, Unify may run on several IP addresses. 
   - The Sale System must always use the DNS endpoints provided by DataMesh and never limit connectivity to a specific IP address
 - The Sale System websocket connection must use TLS v1.2 or v1.3 with the SNI extension and one of the following ciphers:
@@ -1637,7 +1637,7 @@ However, if the Abort Request cannot be accepted due to a message format error o
 
 #### Reconciliation request
 
-> Abort transaction request
+> Reconciliation request
 
 ```json
 {
@@ -1770,48 +1770,37 @@ The card acquisition request allows the Sale System to tokenise a card which can
 
 ```json
 {
-  "SaleToPOIRequest":{
-    "MessageHeader":{
-      "MessageClass":"Service",
-      "MessageCategory":"CardAcquisition",
-      "MessageType":"Request",
-      "ServiceID":"xxx",
-      "SaleID":"xxx",
-      "POIID":"xxx"
+  "SaleToPOIRequest": {
+    "MessageHeader": {
+      "MessageClass": "Service",
+      "MessageCategory": "CardAcquisition",
+      "MessageType": "Request",
+      "ServiceID": "xxx",
+      "SaleID": "xxx",
+      "POIID": "xxx"
     },
-    "CardAcquisitionRequest":{
-      "SaleData":{
-        "OperatorID":"xxx",
-        "OperatorLanguage":"en",
-        "ShiftNumber":"xxx",
-        "CustomerLanguage":"en",
-        "SaleTransactionID":{
-          "TransactionID":"xxx",
-          "TimeStamp":"xxx"
+    "CardAcquisitionRequest": {
+      "SaleData": {
+        "OperatorID": "xxx",
+        "OperatorLanguage": "en",
+        "ShiftNumber": "xxx",
+        "CustomerLanguage": "en",
+        "SaleTransactionID": {
+          "TransactionID": "xxx",
+          "TimeStamp": "xxx"
         },
-        "SaleTerminalData":{
-          "TerminalEnvironment":"xxx",
-          "SaleCapabilities":[
-            "xxx",
-            "xxx",
-            "xxx",
-            "…"
-          ]
+        "SaleTerminalData": {
+          "TerminalEnvironment": "xxx",
+          "SaleCapabilities": ["xxx", "xxx", "xxx", …]
         },
-        "TokenRequestedType":"xxx"
+        "TokenRequestedType": "Customer",
       },
-      "CardAcquisitionTransaction":{
-        "AllowedPaymentBrand":[
-          "xxx",
-          "xxx",
-          "xxx",
-          "…"
-        ],
-        "ForceEntryMode":"xxx"
+      "CardAcquisitionTransaction": {
+        "AllowedPaymentBrand": ["xxx", "xxx", "xxx", …],
+        "ForceEntryMode": "xxx"
       }
     },
-    "SecurityTrailer":{...}
-  }
+    "SecurityTrailer": { ... }
 }
 ```
 
@@ -1820,7 +1809,7 @@ The card acquisition request allows the Sale System to tokenise a card which can
 <div style="width:180px">Attribute</div>  |Requ.| Format | Description |
 -----------------                         |----| ------ | ----------- |
 [MessageClass](#data-dictionary-messageclass)             | ✔ | String | "Service"
-[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "Reconciliation"
+[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "CardAcquisition"
 [MessageType](#data-dictionary-messagetype)               | ✔ | String | "Request"
 [ServiceID](#data-dictionary-serviceid)                   | ✔ | String | A unique value which will be mirrored in the response. See [ServiceID](#data-dictionary-serviceid).
 [SaleID](#data-dictionary-saleid)                         | ✔ | String | Unique identifier for the Sale System
@@ -1846,49 +1835,54 @@ The card acquisition request allows the Sale System to tokenise a card which can
   [AllowedPaymentBrands](#data-dictionary-allowedpaymentbrands)|  | Array  | Restricts the request to specified card brands. See [AllowedPaymentBrands](#data-dictionary-allowedpaymentbrands)
   [ForceEntryMode](#data-dictionary-forceentrymode)           |  | String| If present, restricts card presentment to the specified type. See [ForceEntryMode](#data-dictionary-forceentrymode)
 
-#### Reconciliation response
+#### Card acquisition response
 
-> Reconciliation response
+> Card acquisition response
 
 ```json
 {
-  "SaleToPOIResponse":{
-    "MessageHeader":{
-      "MessageClass":"Service",
-      "MessageCategory":"Reconciliation",
-      "MessageType":"Response",
-      "ServiceID":"xxx",
-      "SaleID":"xxx",
-      "POIID":"xxx"
+  "SaleToPOIResponse": {
+    "MessageHeader": {
+      "MessageClass": "Service",
+      "MessageCategory": "CardAcquisition",
+      "MessageType": "Response",
+      "ServiceID": "xxx",
+      "SaleID": "xxx",
+      "POIID": "xxx"
     },
-    "ReconciliationResponse":{
-      "Response":{
-        "Result":"xxx",
-        "ErrorCondition":"xxx",
-        "AdditionalResponse":"xxx"
+    "CardAcquisitionResponse": {
+      "Response": {
+        "Result": "xxx",
+        "ErrorCondition": "xxx",
+        "AdditionalResponse": "xxx"
       },
-      "ReconciliationType":"xxx",
-      "POIReconciliationID":"xxx",
-      "TransactionTotals":[
-        {
-          "PaymentInstrumentType":"xxx",
-          "CardBrand":"xxx",
-          "OperatorID":"xxx",
-          "ShiftNumber":"xxx",
-          "TotalsGroupID":"xxx",
-          "PaymentCurrency":"AUD",
-          "PaymentTotals":[
-            {
-              "TransactionType":"xxx",
-              "TransactionCount":"xxx",
-              "TransactionAmount":"xxx"
-            }
-          ]
+      "SaleData": {
+        "SaleTransactionID": {
+          "TransactionID": "xxx",
+          "TimeStamp": "xxx"
+        },
+      },
+      "POIData": {
+        "POITransactionID": {
+          "TransactionID": "xxx",
+          "TimeStamp": "xxx"
+        },
+      },
+      "PaymentInstrumentData": {
+        "PaymentInstrumentType": "xxx",
+          "CardData": {
+            "MaskedPAN": "xxxxxx......xxxx",
+            "EntryMode": "xxx"
+          },
+          "PaymentToken":  {
+            "TokenRequestedType": "xxx",
+            "TokenValue": "xxx",
+            "ExpiryDateTime": "xxx"
+          }
         }
-      ]
-    },
-    "SecurityTrailer":{...}
-  }
+      },
+      "SecurityTrailer": {...}
+    }
 }
 ```
 
@@ -1897,33 +1891,39 @@ The card acquisition request allows the Sale System to tokenise a card which can
 <div style="width:180px">Attribute</div>  |Requ.| Format | Description |
 -----------------                         |----| ------ | ----------- |
 [MessageClass](#data-dictionary-messageclass)             | ✔ | String | "Service"
-[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "Reconciliation"
+[MessageCategory](#data-dictionary-messagecategory)       | ✔ | String | "CardAcquisition"
 [MessageType](#data-dictionary-messagetype)               | ✔ | String | "Response"
 [DeviceID](#deviceid)                     | ✔ | String | Unique message identifier
 [SaleID](#data-dictionary-saleid)                         | ✔ | String | Mirrored from payment request
 [POIID](#data-dictionary-poiid)                           | ✔ | String | Mirrored from payment request
 
-**ReconciliationResponse**
+**CardAcquisitionResponse**
 
 <div style="width:180px">Attribute</div>      |Requ.| Format  | Description |
 -----------------                             |----| ------ | ----------- |
-*Response*                                    | ✔ | Object | Object indicating the result of the login
+**Response**                                    | ✔ | Object | Object indicating the result of the login
  [Result](#data-dictionary-result)                            | ✔ | String | Indicates the result of the response. Possible values are "Success" and "Failure"
  [ErrorCondition](#data-dictionary-errorcondition)            |  | String | Indicates the reason an error occurred. Only present when `Result` is "Failure". See [ErrorCondition](#data-dictionary-errorcondition) for more information on possible values.
  [AdditionalResponse](#data-dictionary-additionalresponse)    |  | String | Provides additional error information. Only present when `Result` is "Failure". See [AdditionalResponse](#data-dictionary-additionalresponse) for more information on possible values. 
-[ReconciliationType](#reconciliationtype)     | ✔ | String | Mirrored from request
-[POIReconciliationID](#data-dictionary-poireconciliationid)   |  | String | Present if `Result` is "Success". The `ReconciliationID` of the period requested
-*TransactionTotals*                           |  | Array | Present if `Result` is "Success". An array of totals grouped by card brand, then operator, then shift, then TotalsGroupID, then payment currency.
- [PaymentInstrumentType](#data-dictionary-paymentinstrumenttype)| ✔ | String | "Card" (card payment) or "Mobile" (phone/QR code payments)
- [CardBrand](#data-dictionary-cardbrand)                      |  | String | A card brand used during this reconciliation period. See [CardBrand](#data-dictionary-cardbrand)
- [OperatorID](#data-dictionary-operatorid)                    |  | String | An operator id used during this reconciliation period
- [ShiftNumber](#data-dictionary-shiftnumber)                  |  | String | A shift number used during the reconciliation period
- [TotalsGroupID](#data-dictionary-totalsgroupid)              |  | String | A custom grouping of transactions as defined by the Sale System
- [PaymentCurrency](#data-dictionary-paymentcurrency)          |  | String | "AUD"
- *PaymentTotals*                              |  | Array | An array [0..10] of totals grouped by transaction payment type. Present if both `TransactionCount` and `TransactionAmount` are not equal to zero
-  [TransactionType](#data-dictionary-transactiontype)         |  | String | Transaction type for this payment. See [TransactionType](#data-dictionary-transactiontype)
-  [TransactionCount](#transactioncount)       |  | String | The number of transactions for the transaction type for the current grouping of transactions
-  [TransactionAmount](#transactionamount)     |  | Number | The total amount of transactions for the transaction type for the current grouping of transactions
+**SaleData**                                 | ✔ | Object | 
+ **SaleTransactionID**                       | ✔ | Object | 
+  [TransactionID](#data-dictionary-transactionid)            | ✔ | String | Mirrored from the request
+  [TimeStamp](#data-dictionary-timestamp)                    | ✔ | String | Mirrored from the request
+ [SaleReferenceID](#data-dictionary-salereferenceid)         |  | String | Mirrored from the request
+**POIData**                                  | ✔ | Object | 
+ **POITransactionID**                        | ✔ | Object | 
+  [TransactionID](#data-dictionary-transactionid)            | ✔ | String | A unique transaction id from the POI system
+  [TimeStamp](#data-dictionary-timestamp)                    | ✔ | String | Time on the POI system, formatted as [ISO8601](https://en.wikipedia.org/wiki/ISO_8601)
+ **[PaymentInstrumentData](#data-dictionary-paymentinstrumentdata)** |  | Object | Object with represents card details for token or manually enter card details. 
+[PaymentInstrumentType](#data-dictionary-paymentinstrumenttype)|  | String | Defaults to "Card". Indicates the card source for the payment. See [PaymentInstrumentType](#data-dictionary-paymentinstrumenttype)
+**CardData**                               |  | Object | 
+ [EntryMode](#data-dictionary-entrymode)                   |  | String | Only present if `PaymentInstrumentType` is "Card". "File" if a Payment Token is used, and "Keyed" for a Card Not Present transaction. 
+ [MaskedPAN](#data-dictionary-maskedpan)                   | ✔ | String | PAN masked with dots, first 6 and last 4 digits visible
+ **PaymentToken**                          | ✔ | Object | Only present if [EntryMode](#data-dictionary-entrymode) is "File". Object with identifies the payment token. 
+  [TokenRequestedType](#data-dictionary-tokenrequestedtype)| ✔ | String | "Transaction" or "Customer". Must match the type of token recorded in the POI System.
+  [TokenValue](#tokenvalue)                | ✔ | String | Token previously returned from the POI System in the payment, or card acquisition response 
+
+
 
  
 ## Error handling
