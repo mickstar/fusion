@@ -453,23 +453,32 @@
             <a href="#satellite-api-reference" class="toc-h1 toc-link" data-title="Satellite API Reference">Satellite API Reference</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#satellite-api-reference-message-format" class="toc-h2 toc-link" data-title="Message format">Message format</a>
+                    <a href="#satellite-api-reference-libraries" class="toc-h2 toc-link" data-title="Libraries">Libraries</a>
 					
 					  <ul class="toc-list-h3">
 						  <li>
-							<a href="#satellite-api-reference-message-format-intent-request" class="toc-h3 toc-link" data-title="Intent request">Intent request</a>
+							<a href="#satellite-api-reference-libraries-how-to-include-the-library" class="toc-h3 toc-link" data-title="How to include the library">How to include the library</a>
+						  </li>
+					  </ul>
+                  </li>
+                  <li>
+                    <a href="#satellite-api-reference-sending-messages" class="toc-h2 toc-link" data-title="Sending messages">Sending messages</a>
+					
+					  <ul class="toc-list-h3">
+						  <li>
+							<a href="#satellite-api-reference-sending-messages-intent-request" class="toc-h3 toc-link" data-title="Intent request">Intent request</a>
 						  </li>
 						  <li>
-							<a href="#satellite-api-reference-message-format-intent-response" class="toc-h3 toc-link" data-title="Intent response">Intent response</a>
+							<a href="#satellite-api-reference-sending-messages-intent-response" class="toc-h3 toc-link" data-title="Intent response">Intent response</a>
 						  </li>
 						  <li>
-							<a href="#satellite-api-reference-message-format-request-response-object" class="toc-h3 toc-link" data-title="Request/response object">Request/response object</a>
+							<a href="#satellite-api-reference-sending-messages-request-response-object" class="toc-h3 toc-link" data-title="Request/response object">Request/response object</a>
 						  </li>
 						  <li>
-							<a href="#satellite-api-reference-message-format-messageheader" class="toc-h3 toc-link" data-title="MessageHeader">MessageHeader</a>
+							<a href="#satellite-api-reference-sending-messages-messageheader" class="toc-h3 toc-link" data-title="MessageHeader">MessageHeader</a>
 						  </li>
 						  <li>
-							<a href="#satellite-api-reference-message-format-payload" class="toc-h3 toc-link" data-title="Payload">Payload</a>
+							<a href="#satellite-api-reference-sending-messages-payload" class="toc-h3 toc-link" data-title="Payload">Payload</a>
 						  </li>
 					  </ul>
                   </li>
@@ -6052,99 +6061,93 @@ The new Fusion Satellite API documented below is currently unavailable in produc
 </aside>
 
 <p>The Fusion Satellite API allows a Sale System running on the POI terminal to communicate with the DataMesh Satellite payment application on the same POI terminal using inter-app communication with <a href="https://developer.android.com/guide/components/intents-filters">Android intents</a>.</p>
-<h2 id='satellite-api-reference-message-format'>Message format</h2>
+<h2 id='satellite-api-reference-libraries'>Libraries</h2>
+<p>DataMesh have published a library to Maven Central which wraps the Satellite API. This is the recommended method of interacting with the Fusion Satellite API.</p>
+
+<ul>
+<li>Library on Maven Central <a href="https://search.maven.org/artifact/com.datameshgroup.fusion/fusion-sdk">fusion-sdk</a></li>
+<li>Demo application which utilises the library <a href="https://github.com/datameshgroup/fusionsatellite-sdk-android-demo">fusionsatellite-sdk-android-demo</a></li>
+<li>Library source code <a href="https://github.com/datameshgroup/fusionsatellite-sdk-java">fusionsatellite-sdk-java</a></li>
+</ul>
+<h3 id='satellite-api-reference-libraries-how-to-include-the-library'>How to include the library</h3>
+<p><code>implementation &quot;com.datameshgroup.fusion:fusion-sdk:1.0.1&quot;</code></p>
+
+<p>If you are using Android you will need to add Java 8 syntax desugaring. In your app&#39;s build.gradle</p>
+<div class="highlight"><pre class="highlight plaintext"><code>android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+}
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+}
+</code></pre></div><h2 id='satellite-api-reference-sending-messages'>Sending messages</h2>
 <p>The Satellite API utilises an Android intent with request/response objects based on the Nexo <code>SaleToPOIRequest</code> and <code>SaleToPOIResponse</code></p>
-<h3 id='satellite-api-reference-message-format-intent-request'>Intent request</h3><div class="highlight"><pre class="highlight java tab-java"><code><span class="nc">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Intent</span><span class="o">(</span><span class="s">"au.com.dmg.axispay"</span><span class="o">);</span>
+<h3 id='satellite-api-reference-sending-messages-intent-request'>Intent request</h3>
+<p>The app uses intents to send and receive messages</p>
+<div class="highlight"><pre class="highlight java tab-java"><code><span class="nc">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getPackageManager</span><span class="o">().</span><span class="na">getLaunchIntentForPackage</span><span class="o">(</span><span class="s">"au.com.dmg.axispay"</span><span class="o">);</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">intent</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="s">"AxisPay not Available."</span><span class="o">,</span> <span class="nc">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+    <span class="k">return</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="c1">// wrapper of request.</span>
+<span class="nc">SaleToPOIRequest</span> <span class="n">request</span> <span class="c1">// You need to build this yourself first.</span>
+<span class="nc">Message</span> <span class="n">message</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Message</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+<span class="c1">// this is required for the intent filter.</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="s">"au.com.axispay.action.SaleToPOIRequest"</span><span class="o">);</span>
+
+<span class="c1">// this is required for the intent filter.</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">addCategory</span><span class="o">(</span><span class="nc">Intent</span><span class="o">.</span><span class="na">CATEGORY_DEFAULT</span><span class="o">);</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="nc">Message</span><span class="o">.</span><span class="na">INTENT_EXTRA_MESSAGE</span><span class="o">,</span> <span class="n">message</span><span class="o">.</span><span class="na">toJson</span><span class="o">());</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="nc">Message</span><span class="o">.</span><span class="na">INTENT_EXTRA_PARENT_ID</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">getPackageName</span><span class="o">());</span>
+
+<span class="c1">// name of this app, that get's treated as the POS label by the terminal.</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="s">"ApplicationName"</span><span class="o">,</span> <span class="s">"DemoPOS"</span><span class="o">);</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="s">"SoftwareVersion"</span><span class="o">,</span> <span class="s">"1.0.0"</span><span class="o">);</span>
+<span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+</code></pre></div><h3 id='satellite-api-reference-sending-messages-intent-response'>Intent response</h3>
+<p>In your AndroidManifest.xml you must place an android intent filter to receive the response.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>&lt;intent-filter&gt;
+  &lt;action android:name="au.com.axispay.action.SaleToPOIResponse" /&gt;
+  &lt;category android:name="android.intent.category.DEFAULT" /&gt;
+&lt;/intent-filter&gt;
 </code></pre></div>
-<p>The intent must set the following action <code>au.com.dmg.axispay</code></p>
-<div class="highlight"><pre class="highlight java tab-java"><code><span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">PAYMENT_REQUEST</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
-<span class="n">startActivityForResult</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="no">PAYMENT_REQUEST</span><span class="o">);</span>
-</code></pre></div>
-<blockquote>
-<p>Note that <code>PAYMENT_REQUEST</code> may be any number.</p>
-</blockquote>
-
-<p>Launch the Satellite payment activity by calling <code>startActivityForResult</code></p>
-
-<p>The following extra data may accompany the Intent:</p>
-
-<table><thead>
-<tr>
-<th>Extra Data Name</th>
-<th>Requ.</th>
-<th>Format</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#data-dictionary-applicationname">ApplicationName</a></td>
-<td>✔</td>
-<td>String</td>
-<td>The name of the Sale System application</td>
-</tr>
-<tr>
-<td><a href="#data-dictionary-softwareversion">SoftwareVersion</a></td>
-<td>✔</td>
-<td>String</td>
-<td>The software version of the Sale System</td>
-</tr>
-<tr>
-<td><a href="#data-dictionary-operatorid">OperatorId</a></td>
-<td></td>
-<td>String</td>
-<td>Groups transactions under this operator id</td>
-</tr>
-<tr>
-<td><a href="#data-dictionary-shiftnumber">ShiftNumber</a></td>
-<td></td>
-<td>String</td>
-<td>Groups transactions under this shift number</td>
-</tr>
-<tr>
-<td>Request</td>
-<td>✔</td>
-<td>String</td>
-<td>Json <code>SaleToPOIRequest</code> object which represents the request</td>
-</tr>
-</tbody></table>
-<h3 id='satellite-api-reference-message-format-intent-response'>Intent response</h3><div class="highlight"><pre class="highlight java tab-java"><code><span class="nd">@Override</span>
-<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onActivityResult</span><span class="o">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="o">,</span> <span class="kt">int</span> <span class="n">resultCode</span><span class="o">,</span> <span class="nc">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
-
-    <span class="k">if</span> <span class="o">(</span><span class="n">requestCode</span> <span class="o">==</span> <span class="no">PAYMENT_REQUEST</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(</span><span class="n">resultCode</span> <span class="o">==</span> <span class="nc">Activity</span><span class="o">.</span><span class="na">RESULT_OK</span><span class="o">){</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">intent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-                <span class="c1">// Handle SaleToPoiResponse in response extra data</span>
-            <span class="o">}</span>
-        <span class="o">}</span>
-        <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">resultCode</span> <span class="o">==</span> <span class="nc">Activity</span><span class="o">.</span><span class="na">RESULT_CANCELED</span><span class="o">)</span> <span class="o">{</span>
-            <span class="c1">// Payment failed.</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">intent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-              <span class="c1">// Optionally check SaleToPoiResponse in response extra data</span>
-            <span class="o">}</span>           
-        <span class="o">}</span>
+<p>Add this to the activity you wish to receive the response on. Then on that activity, add the following code.</p>
+<div class="highlight"><pre class="highlight java tab-java"><code><span class="n">onCreate</span><span class="o">(</span> <span class="o">...</span> <span class="o">){</span>
+    <span class="o">...</span>
+    <span class="c1">// add this code to the onCreate method of your activity.</span>
+    <span class="nc">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">();</span>
+    <span class="k">if</span><span class="o">(</span><span class="n">intent</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">intent</span><span class="o">.</span><span class="na">hasExtra</span><span class="o">(</span><span class="nc">Message</span><span class="o">.</span><span class="na">INTENT_EXTRA_MESSAGE</span><span class="o">){</span>
+        <span class="n">handleResponseIntent</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
-</code></pre></div>
-<p>If the result is <code>Activity.RESULT_CANCELED</code> then the transaction has been aborted and not completed. If the result is <code>Activity.RESULT_OK</code> then the transaction has completed. </p>
 
-<p>The following extra data may accompany the response:</p>
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onNewIntent</span><span class="o">(</span><span class="nc">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">.</span><span class="na">onNewIntent</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">isResponseIntent</span><span class="o">(</span><span class="n">intent</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">handleResponseIntent</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-<table><thead>
-<tr>
-<th>Extra Data Name</th>
-<th>Requ.</th>
-<th>Format</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>Response</td>
-<td>✔</td>
-<td>String</td>
-<td>Json <code>SaleToPOIResponse</code> object which represents the response</td>
-</tr>
-</tbody></table>
-<h3 id='satellite-api-reference-message-format-request-response-object'>Request/response object</h3>
+<span class="kt">void</span> <span class="nf">handleResponseIntent</span><span class="o">(</span><span class="nc">Intent</span> <span class="n">intent</span><span class="o">){</span>
+    <span class="c1">// The response is sent as a Json and we will need to deserialize it.</span>
+    <span class="nc">Message</span> <span class="n">message</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">try</span><span class="o">{</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="nc">Message</span><span class="o">.</span><span class="na">fromJson</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">getStringExtra</span><span class="o">(</span><span class="nc">Message</span><span class="o">.</span><span class="na">INTENT_EXTRA_MESSAGE</span><span class="o">));</span>
+    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">){</span>
+        <span class="c1">// json errors may occur,</span>
+        <span class="c1">// if this is occuring, make sure you are using the latest fusion-sdk library</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="nc">SaleToPOIResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="na">response</span><span class="o">;</span>
+    <span class="c1">// we can now access the data.</span>
+<span class="o">}</span>
+</code></pre></div><h3 id='satellite-api-reference-sending-messages-request-response-object'>Request/response object</h3>
 <blockquote>
 <p>SaleToPOIRequest</p>
 </blockquote>
@@ -6190,7 +6193,7 @@ the Sale System must ignore when extra objects and fields are present in respons
 <li>A <a href="#messageheader">MessageHeader</a> object.</li>
 <li>A <a href="#payload">Payload</a> object of variable types.</li>
 </ol>
-<h3 id='satellite-api-reference-message-format-messageheader'>MessageHeader</h3>
+<h3 id='satellite-api-reference-sending-messages-messageheader'>MessageHeader</h3>
 <blockquote>
 <p>MessageHeader</p>
 </blockquote>
@@ -6236,7 +6239,7 @@ the Sale System must ignore when extra objects and fields are present in respons
 <td>A unique value which will be mirrored in the response. See <a href="#data-dictionary-serviceid">ServiceID</a>.</td>
 </tr>
 </tbody></table>
-<h3 id='satellite-api-reference-message-format-payload'>Payload</h3>
+<h3 id='satellite-api-reference-sending-messages-payload'>Payload</h3>
 <p>An object which defines fields for the request/response. The object name depends on the <a href="#data-dictionary-messagecategory">MessageCategory</a> defined in the <code>MessageHeader</code></p>
 
 <p>e.g. a payment will include a <code>PaymentRequest</code>/<code>PaymentResponse</code>.</p>
