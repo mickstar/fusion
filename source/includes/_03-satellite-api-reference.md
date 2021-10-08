@@ -6,69 +6,113 @@ The new Fusion Satellite API documented below is currently unavailable in produc
 
 The Fusion Satellite API allows a Sale System running on the POI terminal to communicate with the DataMesh Satellite payment application on the same POI terminal using inter-app communication with [Android intents](https://developer.android.com/guide/components/intents-filters).
 
+## Libraries
 
-## Message format
+DataMesh have published a library to Maven Central which wraps the Satellite API. This is the recommended method of interacting with the Fusion Satellite API.
+
+* Library on Maven Central [fusion-sdk](https://search.maven.org/artifact/com.datameshgroup.fusion/fusion-sdk)
+* Demo application which utilises the library [fusionsatellite-sdk-android-demo](https://github.com/datameshgroup/fusionsatellite-sdk-android-demo)
+* Library source code [fusionsatellite-sdk-java](https://github.com/datameshgroup/fusionsatellite-sdk-java)
+
+### How to include the library
+
+`implementation "com.datameshgroup.fusion:fusion-sdk:1.0.1"`
+
+If you are using Android you will need to add Java 8 syntax desugaring. In your app's build.gradle
+
+```
+android {
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+		coreLibraryDesugaringEnabled true
+	}
+}
+dependencies {
+	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+}
+```
+
+## Sending messages 
 
 The Satellite API utilises an Android intent with request/response objects based on the Nexo `SaleToPOIRequest` and `SaleToPOIResponse`
 
 ### Intent request
 
-```java
-Intent intent = new Intent("au.com.dmg.axispay");
-```
-
-The intent must set the following action `au.com.dmg.axispay`
+The app uses intents to send and receive messages
 
 ```java
-static final int PAYMENT_REQUEST = 1;
-startActivityForResult(intent, PAYMENT_REQUEST);
+Intent intent = getPackageManager().getLaunchIntentForPackage("au.com.dmg.axispay");
+if (intent == null) {
+    Toast.makeText(this, "AxisPay not Available.", Toast.LENGTH_SHORT).show();
+    return;
+}
+
+// wrapper of request.
+SaleToPOIRequest request // You need to build this yourself first.
+Message message = new Message(request);
+
+// this is required for the intent filter.
+intent.setAction("au.com.axispay.action.SaleToPOIRequest");
+
+// this is required for the intent filter.
+intent.addCategory(Intent.CATEGORY_DEFAULT);
+intent.putExtra(Message.INTENT_EXTRA_MESSAGE, message.toJson());
+intent.putExtra(Message.INTENT_EXTRA_PARENT_ID, this.getPackageName());
+
+// name of this app, that get's treated as the POS label by the terminal.
+intent.putExtra("ApplicationName", "DemoPOS");
+intent.putExtra("SoftwareVersion", "1.0.0");
+startActivity(intent);
 ```
-
-> Note that `PAYMENT_REQUEST` may be any number.
-
-Launch the Satellite payment activity by calling `startActivityForResult`
-
-The following extra data may accompany the Intent:
-
-Extra Data Name                       |Requ.| Format | Description |
------------------                     |---- | ------ | ----------- |
-[ApplicationName](#data-dictionary-applicationname)   | ✔  | String | The name of the Sale System application
-[SoftwareVersion](#data-dictionary-softwareversion)   | ✔  | String | The software version of the Sale System
-[OperatorId](#data-dictionary-operatorid)             |     | String | Groups transactions under this operator id
-[ShiftNumber](#data-dictionary-shiftnumber)           |     | String | Groups transactions under this shift number
-Request                               | ✔  | String | Json `SaleToPOIRequest` object which represents the request
-
 
 ### Intent response
 
+In your AndroidManifest.xml you must place an android intent filter to receive the response.
 
-```java
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
-    if (requestCode == PAYMENT_REQUEST) {
-        if(resultCode == Activity.RESULT_OK){
-            if (intent != null) {
-                // Handle SaleToPoiResponse in response extra data
-            }
-        }
-        else if (resultCode == Activity.RESULT_CANCELED) {
-            // Payment failed.
-            if (intent != null) {
-              // Optionally check SaleToPoiResponse in response extra data
-            }			
-        }
-    }
-}
+```
+<intent-filter>
+  <action android:name="au.com.axispay.action.SaleToPOIResponse" />
+  <category android:name="android.intent.category.DEFAULT" />
+</intent-filter>
 ```
 
-If the result is `Activity.RESULT_CANCELED` then the transaction has been aborted and not completed. If the result is `Activity.RESULT_OK` then the transaction has completed. 
+Add this to the activity you wish to receive the response on. Then on that activity, add the following code.
 
-The following extra data may accompany the response:
 
-Extra Data Name                       |Requ.| Format | Description |
------------------                     |---- | ------ | ----------- |
-Response                              | ✔  | String | Json `SaleToPOIResponse` object which represents the response
+
+```java
+onCreate( ... ){
+    ...
+    // add this code to the onCreate method of your activity.
+    Intent intent = getIntent();
+    if(intent != null && intent.hasExtra(Message.INTENT_EXTRA_MESSAGE){
+        handleResponseIntent(intent);
+    }
+}
+
+@Override
+protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    if (isResponseIntent(intent)) {
+        handleResponseIntent(intent);
+    }
+}
+
+void handleResponseIntent(Intent intent){
+    // The response is sent as a Json and we will need to deserialize it.
+    Message message = null;
+    try{
+        message = Message.fromJson(intent.getStringExtra(Message.INTENT_EXTRA_MESSAGE));
+    } catch(Exception e){
+        // json errors may occur,
+        // if this is occuring, make sure you are using the latest fusion-sdk library
+        return;
+    }
+    SaleToPOIResponse response = message.response;
+    // we can now access the data.
+}
+```
 
 
 ### Request/response object
